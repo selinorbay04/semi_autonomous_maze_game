@@ -6,48 +6,30 @@
 #include <stdint.h>
 #include "nrf.h"
 #include "nrf_delay.h"
-#include "nrf_gpio.h"
-#include "app_error.h"
-#include "nrfx_twi.h"
 #include "nrf_drv_twi.h"
+#include "nrf_gpio.h"
+#include "nrf_twi_mngr.h"
 
 
 // Pin configurations
 #include "microbit_v2.h"
 
-#define NRFX_TWI0_INST_IDX 0
-
-static const nrfx_twi_t my_twi = NRFX_TWI0_INST_IDX(0);
-
-nrfx_twi_config_t twi_config = {
-  .scl = NRF_GPIO_PIN_MAP(0, 19),
-  .sda = NRF_GPIO_PIN_MAP(0, 20),
-  .frequency = NRF_TWI_FREQ_100K,
-  .interrupt_priority = APP_IRQ_PRIORITY_HIGH
-};
-
-nrfx_twi_evt_handler_t twi_event_handler = NULL;
-
-void twi_init(void) {
-  ret_code_t err_code = nrfx_twi_init(&my_twi, &twi_config, twi_event_handler, NULL);
-  APP_ERROR_CHECK(err_code);
-  nrfx_twi_enable(&my_twi);
-}
-
-
-
-
+NRF_TWI_MNGR_DEF(twi_mngr, 1, 0);
 
 
 int main(void) {
 
   // Initialize.
-  nrf_gpio_cfg_output(LED_MIC);
+  // nrf_gpio_cfg_output(LED_MIC);
 
-  twi_init();
+  nrf_drv_twi_config_t i2c_config = NRF_DRV_TWI_DEFAULT_CONFIG;
 
-  
+  i2c_config.scl = EDGE_P19;
+  i2c_config.sda = EDGE_P20;
+  i2c_config.frequency = NRF_DRV_TWI_FREQ_100K;
+  i2c_config.interrupt_priority = 0;
 
+  nrf_twi_mngr_init(&twi_mngr, &i2c_config);
 
   // Enter main loop.
   while (1) {
