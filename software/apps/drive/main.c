@@ -12,6 +12,8 @@
 #include "nrf_gpio.h"
 #include "nrf_twi_mngr.h"
 
+#include "i2c_utils.h"
+
 
 // Pin configurations
 #include "microbit_v2.h"
