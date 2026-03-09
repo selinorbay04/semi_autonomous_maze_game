@@ -63,6 +63,10 @@ int main(void) {
     printf("error was that bus was busy\n");
   }
 
+  uint8_t buffer = 0;
+  //i2c_write_packet(0x10, &buffer, 2, 0);
+  i2c_manage_packet(0x10, &buffer, 1, 0, true);
+
   bool ascending = false;
 
   // Enter main loop.

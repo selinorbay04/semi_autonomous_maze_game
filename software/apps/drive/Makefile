@@ -12,7 +12,8 @@ APP_SOURCE_PATHS += .
 # Add new include header files
 APP_HEADER_PATHS += ../include/.
 APP_SOURCE_PATHS += ../include/.
-APP_SOURCES = $(notdir $(wildcard ./*.c))
+APP_SOURCES += $(notdir $(wildcard ./*.c))
+APP_SOURCES += $(notdir $(wildcard ../include/*.c))
 
 # Path to base of nRF52x-base repo
 NRF_BASE_DIR = ../../nrf52x-base/
