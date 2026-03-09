@@ -5,8 +5,9 @@
 #include "sdk_errors.h"
 #include <stdint.h>
 
+#define NO_STOP NRF_TWI_MNGR_NO_STOP
 
-ret_code_t i2c_init(const nrf_twi_mngr_t* i2c);
+void i2c_init();
 
 #define i2c_write_byte(i2c_addr, buffer, flags) \
     i2c_write_packet(i2c_addr, buffer, 1, flags)

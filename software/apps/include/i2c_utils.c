@@ -1,18 +1,35 @@
 
 #include "nrf.h"
+#include "microbit_v2.h"
 #include "nrf_error.h"
 #include "nrf_twi_mngr.h"
 #include "sdk_errors.h"
 #include <stdint.h>
 #include <stdio.h>
 
-// Pointer to initialized i2c manager
-static const nrf_twi_mngr_t* i2c_manager = NULL;
+#include "state.h"
+#include "i2c_utils.h"
 
-void i2c_init(const nrf_twi_mngr_t* i2c) {
-    i2c_manager = i2c;
+// External i2c manager
+extern const nrf_twi_mngr_t* i2c;
+
+void i2c_init() {
+
+  nrf_drv_twi_config_t i2c_config = NRF_DRV_TWI_DEFAULT_CONFIG;
+  printf("I'm running!\n");
+  i2c_config.scl = EDGE_P19;
+  i2c_config.sda = EDGE_P20;
+  i2c_config.frequency = NRF_DRV_TWI_FREQ_100K;
+  i2c_config.interrupt_priority = 0;
+
+  ret_code_t init_ret = nrf_twi_mngr_init(i2c, &i2c_config);
+  if (init_ret != NRF_SUCCESS) {
+    printf("some error in init twi\n");
+  } else {
+    printf("successful twi init\n");
+  }
+
 }
-
 
 void i2c_manage_packet(uint8_t i2c_addr,
                        uint8_t *buffer,
@@ -29,9 +46,9 @@ void i2c_manage_packet(uint8_t i2c_addr,
     ret_code_t result;
 
     if (rx) {
-        result = nrf_twi_mngr_perform(i2c_manager, NULL, &read_transfer, 1, NULL);
+        result = nrf_twi_mngr_perform(i2c, NULL, &read_transfer, 1, NULL);
     } else {
-        result = nrf_twi_mngr_perform(i2c_manager, NULL, &write_transfer, 1, NULL);
+        result = nrf_twi_mngr_perform(i2c, NULL, &write_transfer, 1, NULL);
     }
 
     if (result != NRF_SUCCESS) {
