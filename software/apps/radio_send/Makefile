@@ -6,15 +6,16 @@ SDK_VERSION = 16
 SOFTDEVICE_MODEL = blank
 
 # Source and header files
-APP_HEADER_PATHS += .
-APP_SOURCE_PATHS += .
+APP_HEADER_PATHS += . ../include
+APP_SOURCE_PATHS += . ../include
 APP_SOURCES = $(notdir $(wildcard ./*.c))
+APP_SOURCES += radio_utils.c
 
 # Path to base of nRF52x-base repo
 NRF_BASE_DIR = ../../nrf52x-base/
 
 # Include board Makefile (if any)
-include ../../boards/microbit_v2/Board.mk
+include ../../boards/microbit_v2_154/Board.mk
 
 # Include main Makefile
 include $(NRF_BASE_DIR)/make/AppMakefile.mk
