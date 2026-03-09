@@ -19,7 +19,7 @@ APP_SOURCES += $(notdir $(wildcard ../include/*.c))
 NRF_BASE_DIR = ../../nrf52x-base/
 
 # Include board Makefile (if any)
-include ../../boards/microbit_v2/Board.mk
+include ../../boards/microbit_v2_154/Board.mk
 
 # Include main Makefile
 include $(NRF_BASE_DIR)/make/AppMakefile.mk
