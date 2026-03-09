@@ -31,6 +31,11 @@ void i2c_init() {
 
 }
 
+void i2c_read_reg(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t length) {
+    i2c_write_byte(i2c_addr, &reg_addr, NRF_TWI_MNGR_NO_STOP);
+    i2c_read_packet(i2c_addr, buffer, length, 0);
+}
+
 void i2c_manage_packet(uint8_t i2c_addr,
                        uint8_t *buffer,
                        uint8_t length,
