@@ -17,16 +17,19 @@
 #include "sdk_errors.h"
 #include "nrf_802154.h"
 #include "radio_utils.h"
+#include "car_utils.h"
+#include "state.h"
+#include "i2c_utils.h"
 
-#define MOTOR_ADDR 0x59
+// #define MOTOR_ADDR 0x59
 
-NRF_TWI_MNGR_DEF(twi_mngr, 1, 0);
+// NRF_TWI_MNGR_DEF(twi_mngr, 1, 0);
 
-static nrf_drv_twi_config_t i2c_config;
+// static nrf_drv_twi_config_t i2c_config;
 
-static uint8_t en_data[2]    = {0x70, 1};
-static uint8_t motor1_data[2] = {0x20, 128}; //stop = 128 ?
-static uint8_t motor2_data[2] = {0x21, 128}; //stop = 128 ?
+// static uint8_t en_data[2]    = {0x70, 1};
+// static uint8_t motor1_data[2] = {0x20, 129}; //stop = 128 ?
+// static uint8_t motor2_data[2] = {0x21, 129}; //stop = 128 ?
 
 
 //Command queue for passing data from the radio receive callback to the main loop.
@@ -46,28 +49,26 @@ void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi) {
 
 static void drive_motors(uint8_t cmd) {
     if (cmd == TURN_LEFT) {
-        motor1_data[1] = 50; //left R  
-        motor2_data[1] = 200; // right F
+        turn(LEFT, 100);
         printf("Turning left\n");
     } else if (cmd == TURN_RIGHT) {
-        motor1_data[1] = 200; // left F
-        motor2_data[1] = 50;  // right R
+        turn(RIGHT, 100);
         printf("Turning right\n");
     } else {
         printf("Unknown command: 0x%02X\n", cmd);
         return;
     }
 
-    nrf_twi_mngr_transfer_t transfers[3] = {
-        NRF_TWI_MNGR_WRITE(MOTOR_ADDR, en_data,     2, 0),
-        NRF_TWI_MNGR_WRITE(MOTOR_ADDR, motor1_data, 2, 0),
-        NRF_TWI_MNGR_WRITE(MOTOR_ADDR, motor2_data, 2, 0),
-    };
+    // nrf_twi_mngr_transfer_t transfers[3] = {
+    //     NRF_TWI_MNGR_WRITE(MOTOR_ADDR, en_data,     2, 0),
+    //     NRF_TWI_MNGR_WRITE(MOTOR_ADDR, motor1_data, 2, 0),
+    //     NRF_TWI_MNGR_WRITE(MOTOR_ADDR, motor2_data, 2, 0),
+    // };
 
-    ret_code_t err = nrf_twi_mngr_perform(&twi_mngr, &i2c_config, transfers, 3, NULL);
-    if (err != NRF_SUCCESS) {
-        printf("I2C perform failed: %d\n", (int)err);
-    }
+    // ret_code_t err = nrf_twi_mngr_perform(&twi_mngr, &i2c_config, transfers, 3, NULL);
+    // if (err != NRF_SUCCESS) {
+    //     printf("I2C perform failed: %d\n", (int)err);
+    // }
 }
 
 
@@ -75,18 +76,20 @@ int main(void) {
     nrf_delay_ms(100);
     printf("Receiver running!\n");
 
-    i2c_config             = (nrf_drv_twi_config_t)NRF_DRV_TWI_DEFAULT_CONFIG;
-    i2c_config.scl         = EDGE_P19;
-    i2c_config.sda         = EDGE_P20;
-    i2c_config.frequency   = NRF_DRV_TWI_FREQ_100K;
-    i2c_config.interrupt_priority = 0;
+    // i2c_config             = (nrf_drv_twi_config_t)NRF_DRV_TWI_DEFAULT_CONFIG;
+    // i2c_config.scl         = EDGE_P19;
+    // i2c_config.sda         = EDGE_P20;
+    // i2c_config.frequency   = NRF_DRV_TWI_FREQ_100K;
+    // i2c_config.interrupt_priority = 0;
 
-    ret_code_t err = nrf_twi_mngr_init(&twi_mngr, &i2c_config);
-    if (err != NRF_SUCCESS) {
-        printf("I2C init failed: %d\n", (int)err);
-    } else {
-        printf("I2C init OK\n");
-    }
+    // ret_code_t err = nrf_twi_mngr_init(&twi_mngr, &i2c_config);
+    // if (err != NRF_SUCCESS) {
+    //     printf("I2C init failed: %d\n", (int)err);
+    // } else {
+    //     printf("I2C init OK\n");
+    // }
+
+    i2c_init();
 
     // Configure radio as receiver and listen 
     nrf_802154_configure(false);

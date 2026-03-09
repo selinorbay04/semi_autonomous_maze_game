@@ -16,7 +16,7 @@ extern const nrf_twi_mngr_t* i2c;
 void i2c_init() {
 
   nrf_drv_twi_config_t i2c_config = NRF_DRV_TWI_DEFAULT_CONFIG;
-  printf("I'm running!\n");
+  printf("I'm running! (TWI)\n");
   i2c_config.scl = EDGE_P19;
   i2c_config.sda = EDGE_P20;
   i2c_config.frequency = NRF_DRV_TWI_FREQ_100K;
