@@ -54,3 +54,16 @@ void drive_left(int speed) {
     set_speed(motor2, speed);
     i2c_write_packet(MOTOR_ADDR, motor2, 2, 0);
 }
+
+void turn(CAR_DIRECTION direction, int speed) {
+    switch (direction) {
+        case LEFT:
+            drive_left(-speed);
+            drive_right(speed);
+            break;
+        case RIGHT:
+            drive_left(speed);
+            drive_right(-speed);
+            break;
+    }
+}
