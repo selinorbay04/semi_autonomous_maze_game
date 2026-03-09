@@ -15,3 +15,5 @@ void i2c_read_byte(uint8_t i2c_addr, uint8_t* buffer);
 void i2c_write_packet(uint8_t i2c_addr, uint8_t* payload);
 
 void i2c_read_packet(uint8_t i2c_addr, uint8_t* buffer);
+
+void 
