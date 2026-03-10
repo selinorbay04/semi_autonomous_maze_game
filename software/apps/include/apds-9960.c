@@ -71,3 +71,8 @@ uint16_t read_color() {
     return cdata;
     //return cdata_scaled;
 }
+
+void update_line_state(int threshold) {
+    // TODO: Might need to go in the mux helper actually
+}
+

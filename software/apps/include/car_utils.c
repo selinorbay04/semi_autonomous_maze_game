@@ -1,4 +1,5 @@
 
+#include "apds-9960.h"
 #include "nrf.h"
 #include "i2c_utils.h"
 #include "nrf_twi_mngr.h"
@@ -68,3 +69,9 @@ void turn(CAR_DIRECTION direction, int speed) {
             break;
     }
 }
+
+void auto_drive(int drive_speed, int turn_speed, int threshold) {
+    drive(drive_speed);
+    update_line_state(threshold);
+}
+
