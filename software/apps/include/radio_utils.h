@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef RADIO_UTILS_H
+#define RADIO_UTILS_H
+
 #include "nrf.h"
 #include "nrf_error.h"
 #include "nrf_802154.h"
@@ -40,3 +43,5 @@ void     send_pkt(uint8_t* pkt);
 // RX helpers
 void    recieve_(void);
 uint8_t recieve_pkt_raw(uint8_t* pkt); 
+
+#endif

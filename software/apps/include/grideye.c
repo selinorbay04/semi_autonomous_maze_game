@@ -30,7 +30,33 @@ void print_grid() {
     printf("\n");
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
-            printf("[%02.0f] ", grid[row*8 + col]);
+            printf("[%02.2f] ", grid[row*8 + col]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void print_grid_threshold(float threshold) {
+    float grid[64];
+    read_grid(grid);
+    float average_val = 0;
+
+    for (int i = 0; i < 64; i++) {
+        average_val += grid[i];
+    }
+
+    average_val /= 64;
+
+    printf("\n");
+    for (int row = 0; row < 8; row++) {
+        for (int col = 0; col < 8; col++) {
+            float cur_val = grid[row*8 + col];
+            if (cur_val > average_val + threshold) {
+                printf("[X] ");
+            } else {
+                printf("[ ] ");
+            }
         }
         printf("\n");
     }

@@ -1,6 +1,7 @@
 
 #include "nrf.h"
 #include "i2c_utils.h"
+#include "nrf_twi_mngr.h"
 #include "state.h"
 #include <stdint.h>
 
@@ -41,7 +42,7 @@ void motor_init() {
 void drive(int speed) {
     set_speed(motor1, speed);
     set_speed(motor2, speed);
-    i2c_write_packet(MOTOR_ADDR, motor1, 2, NO_STOP);
+    i2c_write_packet(MOTOR_ADDR, motor1, 2, NRF_TWI_MNGR_NO_STOP);
     i2c_write_packet(MOTOR_ADDR, motor2, 2, 0);
 }
 

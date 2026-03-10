@@ -1,13 +1,15 @@
+#ifndef I2C_UTILS_H
+#define I2C_UTILS_H
 
-#include "nrf.h"
-#include "nrf_error.h"
-#include "nrf_twi_mngr.h"
-#include "sdk_errors.h"
+#include <stdbool.h>
 #include <stdint.h>
 
-#define NO_STOP NRF_TWI_MNGR_NO_STOP
-
 void i2c_init();
+
+void i2c_write_reg(uint8_t i2c_addr,
+                  uint8_t reg_addr,
+                  uint8_t* buffer,
+                  uint8_t length);
 
 void i2c_read_reg(uint8_t i2c_addr,
                   uint8_t reg_addr,
@@ -31,3 +33,5 @@ void i2c_manage_packet(uint8_t i2c_addr,
                        uint8_t length,
                        uint8_t flags,
                        bool rx);
+
+#endif

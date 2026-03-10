@@ -1,5 +1,5 @@
-
-#include "nrf.h"
+#ifndef CAR_UTILS_H
+#define CAR_UTILS_H
 
 #define MOTOR_ADDR 0x59
 
@@ -24,3 +24,5 @@ void drive_right(int speed);
 // Function to make a decision at a junction
 // Accepts a direction and a speed -127, 127
 void turn(CAR_DIRECTION direction, int speed);
+
+#endif

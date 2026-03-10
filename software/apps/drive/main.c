@@ -12,6 +12,8 @@
 #include "i2c_utils.h"
 #include "state.h"
 #include "car_utils.h"
+#include "grideye.h"
+#include "apds-9960.h"
 
 // Pin configurations
 #include "microbit_v2.h"
@@ -19,17 +21,16 @@
 int main(void) {
 
   i2c_init();
-
   motor_init();
-  //drive(15);
-  drive_left(-55);
-  drive_right(55);
+  apds_init();
+
 
   // Enter main loop.
   while (1) {
-    nrf_delay_ms(50);
-
-    // nrf_twi_mngr_perform(&twi_mngr, &i2c_config, transfer_array, 3, NULL);
+    // uint16_t read_val = read_color();
+    // printf("Current reading: %u\n", read_val);
+    printf("Currently over line? : %d\n", check_over_line(7));
+    nrf_delay_ms(250);
   }
 }
 
