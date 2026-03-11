@@ -21,6 +21,7 @@ int main(void) {
   i2c_init();
   motor_init();
   mux_init_sensors();
+  hc_sr_init();
   // nrf_802154_configure(true);
 
   //auto_drive(40, 40, 10);

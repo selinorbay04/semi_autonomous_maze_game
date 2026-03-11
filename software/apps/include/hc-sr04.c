@@ -8,21 +8,23 @@
 #include "nrfx_timer.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 static nrfx_timer_t TIMER4 = NRFX_TIMER_INSTANCE(0);
 static bool echo_received = false;
 static uint32_t cc_read = 0;
 
 static void echo_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-    nrfx_gpiote_in_event_disable(ECHO_PIN);
+
     echo_received = true;
 
     // When you get the echo, pause and read timer
     nrfx_timer_pause(&TIMER4);
     cc_read = nrfx_timer_capture(&TIMER4, NRF_TIMER_CC_CHANNEL0);
 
-    nrfx_gpiote_in_event_enable(ECHO_PIN, true);
 }
+
+static void timer_handler(nrf_timer_event_t event, void* context) {}
 
 void hc_sr_init() {
     // Set up one GPIO in and out
@@ -32,9 +34,10 @@ void hc_sr_init() {
     nrf_gpio_pin_clear(ECHO_PIN);
 
     // Set an interrupt for the echo pin
+    nrfx_gpiote_init();
     nrfx_gpiote_in_config_t in_config = NRFX_GPIOTE_CONFIG_IN_SENSE_LOTOHI(true);
     nrfx_gpiote_in_init(ECHO_PIN, &in_config, echo_handler);
-    nrfx_gpiote_in_event_enable(ECHO_PIN, true);
+    nrfx_gpiote_in_event_disable(ECHO_PIN);
 
     // Set up a timer to measure time between
     // trig and echo
@@ -45,7 +48,7 @@ void hc_sr_init() {
         .interrupt_priority = 4,
         .p_context = NULL
     };
-    nrfx_timer_init(&TIMER4, &timer_config, NULL);
+    nrfx_timer_init(&TIMER4, &timer_config, timer_handler);
     nrfx_timer_enable(&TIMER4);
     nrfx_timer_pause(&TIMER4);
 }
@@ -53,6 +56,7 @@ void hc_sr_init() {
 float find_distance() {
     // Clear and start timer and wait for echo
     echo_received = false;
+    nrfx_gpiote_in_event_enable(ECHO_PIN, true);
     nrfx_timer_clear(&TIMER4);
     nrfx_timer_resume(&TIMER4);
 
@@ -64,7 +68,10 @@ float find_distance() {
     // Wait for interrupt from echo
     while (!echo_received) {
         // Spin
+        // printf("spinning...\n");
+        // nrf_delay_ms(100);
     }
+    nrfx_gpiote_in_event_disable(ECHO_PIN);
 
     float distance_in = (float)cc_read / 148.0;
 
