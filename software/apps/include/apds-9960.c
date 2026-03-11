@@ -31,7 +31,7 @@ void apds_init() {
     uint16_t avg_read = 0;
 
     for (int i = 0; i < num_reads; i++) {
-        avg_read += read_color();
+        avg_read += read_clear();
     }
 
     avg_read /= num_reads;
@@ -53,28 +53,41 @@ bool check_avalid() {
 }
 
 bool check_over_line(int threshold) {
-    uint16_t cur_read = read_color();
+    uint16_t cur_read = read_clear();
 
     return cur_read + threshold < state_avg_white_reading;
 }
 
-uint16_t read_color() {
+uint16_t read_color(uint8_t l_reg, uint8_t h_reg) {
     // Wait for AVALID bit
     while (check_avalid()) {
-        //nrf_delay_ms(10);
+        // Spin
     }
 
     // Read from CDATA
     uint8_t cdata_l;
     uint8_t cdata_h;
-    i2c_read_reg(0x39, APDS_CDATAL_ADDR, &cdata_l, 1);
-    i2c_read_reg(0x39, APDS_CDATAH_ADDR, &cdata_h, 1);
+    i2c_read_reg(0x39, l_reg, &cdata_l, 1);
+    i2c_read_reg(0x39, h_reg, &cdata_h, 1);
     uint16_t cdata = ((uint16_t)cdata_h << 8) | (uint16_t)cdata_l;
 
-    //printf("dl: %x dh: %x\n", cdata_l, cdata_h);
-    //printf("Current color: %i\n", cdata);
-
     return cdata;
-    //return cdata_scaled;
+}
+
+bool detect_color(COLOR COI, int threshold) {
+    uint16_t r = read_red();
+    uint16_t g = read_green();
+    uint16_t b = read_blue();
+
+    switch (COI) {
+        case RED:
+            return r > g + threshold && r > b + threshold;
+        case GREEN:
+            return g > r + threshold && g > b + threshold;
+        case BLUE:
+            return b > g + threshold && b > r + threshold;
+    }
+
+    return false;
 }
 

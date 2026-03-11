@@ -13,7 +13,19 @@ typedef enum {
     APDS_STATUS_ADDR = 0x93,
     APDS_CDATAL_ADDR = 0x94,
     APDS_CDATAH_ADDR = 0x95,
+    APDS_RDATAL_ADDR = 0x96,
+    APDS_RDATAH_ADDR = 0x97,
+    APDS_GDATAL_ADDR = 0x98,
+    APDS_GDATAH_ADDR = 0x99,
+    APDS_BDATAL_ADDR = 0x9a,
+    APDS_BDATAH_ADDR = 0x9b,
 } APDS_ADDR;
+
+typedef enum {
+    RED,
+    GREEN,
+    BLUE,
+} COLOR;
 
 #define AVALID_MASK 1
 #define AGAIN_MASK 3
@@ -22,8 +34,17 @@ typedef enum {
 void apds_init();
 void apds_shutdown();
 
-// Read the clear color channel
-uint16_t read_color();
+// Read the clear/r/g/b color channel
+#define read_clear() read_color(APDS_CDATAL_ADDR, APDS_CDATAH_ADDR)
+#define read_red() read_color(APDS_RDATAL_ADDR, APDS_RDATAH_ADDR)
+#define read_green() read_color(APDS_GDATAL_ADDR, APDS_GDATAH_ADDR)
+#define read_blue() read_color(APDS_BDATAL_ADDR, APDS_BDATAH_ADDR)
+uint16_t read_color(uint8_t l_reg, uint8_t h_reg);
+
+// Takes in a color of interest (R/G/B) and a threshold
+// returns true if the color is greater than
+// all the others by more than the threshold
+bool detect_color(COLOR COI, int threshold);
 
 // Return if the sensor is over a line
 // Given a threshold to ignore small variations

@@ -22,14 +22,25 @@ int main(void) {
   mux_init_sensors();
   // nrf_802154_configure(true);
 
-  auto_drive(100, 100, 10);
+  //auto_drive(100, 100, 10);
 
-  // Enter main loop.
-  // while (1) {
-  //   // uint16_t read_val = read_color();
-  //   // printf("Current reading: %u\n", read_val);
-  //   printf("Currently over line? : %d\n", check_over_line(7));
-  //   nrf_delay_ms(250);
-  // }
+  while (1) {
+    uint16_t clear_val = read_clear();
+    uint16_t red_val = read_red();
+    uint16_t green_val = read_green();
+    uint16_t blue_val = read_blue();
+
+    printf("C: %i, R: %i, G: %i, B: %i\n", clear_val, red_val, green_val, blue_val);
+
+    bool red_obj = detect_color(RED, 50);
+    bool green_obj = detect_color(GREEN, 50);
+    bool blue_obj = detect_color(BLUE, 50);
+
+    printf("Looking at a red object?: %i\n", red_obj);
+    printf("Looking at a green object?: %i\n", green_obj);
+    printf("Looking at a blue object?: %i\n\n", blue_obj);
+
+    nrf_delay_ms(250);
+  }
 }
 
