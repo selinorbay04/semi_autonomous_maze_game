@@ -1,12 +1,14 @@
 
-#include "apds-9960.h"
 #include "nrf.h"
-#include "i2c_utils.h"
 #include "nrf_twi_mngr.h"
-#include "state.h"
 #include <stdint.h>
+#include <stdio.h>
 
 #include "car_utils.h"
+#include "i2c_utils.h"
+#include "apds-9960.h"
+#include "state.h"
+#include "radio_utils.h"
 
 // Packages to send with motor commands
 uint8_t en_data[2] = {0x70, 1};
@@ -71,7 +73,37 @@ void turn(CAR_DIRECTION direction, int speed) {
 }
 
 void auto_drive(int drive_speed, int turn_speed, int threshold) {
+
     drive(drive_speed);
-    update_line_state(threshold);
+
+    while (!state_game_over) {
+
+        update_line_state(threshold);
+
+        if (state_line_changed) {
+            switch (state_line_trigger) {
+                case STATE_NO_TRIGGERS:
+                    drive(drive_speed);
+                    state_line_changed = false;
+                    break;
+                case STATE_LEFT_TRIGGERED:
+                    turn(LEFT, turn_speed);
+                    state_line_changed = false;
+                    break;
+                case STATE_RIGHT_TRIGGERED:
+                    turn(RIGHT, turn_speed);
+                    state_line_changed = false;
+                    break;
+                case STATE_AT_JUNCTION:
+                    // Send radio message and wait
+                    // for radio interrupt
+                    // uint8_t* pkt = load_pkt(AT_JUNCTION, 1);
+                    // send_pkt(pkt);
+                    // Some sort of sleep or blocking
+                    break;
+            }
+        }
+
+    }
 }
 

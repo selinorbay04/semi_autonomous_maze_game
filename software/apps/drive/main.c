@@ -14,6 +14,7 @@
 #include "car_utils.h"
 #include "grideye.h"
 #include "apds-9960.h"
+// #include "radio_utils.h"
 
 // Pin configurations
 #include "microbit_v2.h"
@@ -23,14 +24,16 @@ int main(void) {
   i2c_init();
   motor_init();
   apds_init();
+  // nrf_802154_configure(true);
 
+  auto_drive(28, 28, 50);
 
   // Enter main loop.
-  while (1) {
-    // uint16_t read_val = read_color();
-    // printf("Current reading: %u\n", read_val);
-    printf("Currently over line? : %d\n", check_over_line(7));
-    nrf_delay_ms(250);
-  }
+  // while (1) {
+  //   // uint16_t read_val = read_color();
+  //   // printf("Current reading: %u\n", read_val);
+  //   printf("Currently over line? : %d\n", check_over_line(7));
+  //   nrf_delay_ms(250);
+  // }
 }
 

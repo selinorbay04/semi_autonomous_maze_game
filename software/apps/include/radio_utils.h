@@ -14,6 +14,7 @@
 
 #define TURN_LEFT  0xFF
 #define TURN_RIGHT 0x00
+#define AT_JUNCTION 0x30
 
 #define PSDU_MAX_SIZE (127)
 #define FCS_LENGTH    (2)
