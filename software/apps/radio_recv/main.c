@@ -49,10 +49,10 @@ void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi) {
 
 static void drive_motors(uint8_t cmd) {
     if (cmd == TURN_LEFT) {
-        turn(LEFT, 100);
+        turn(LEFT, 40);
         printf("Turning left\n");
     } else if (cmd == TURN_RIGHT) {
-        turn(RIGHT, 100);
+        turn(RIGHT, 40);
         printf("Turning right\n");
     } else {
         printf("Unknown command: 0x%02X\n", cmd);

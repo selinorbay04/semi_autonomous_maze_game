@@ -11,7 +11,7 @@
 #include "i2c_utils.h"
 
 // External i2c manager
-extern const nrf_twi_mngr_t* i2c;
+extern const nrf_twi_mngr_t* state_i2c;
 
 void i2c_init() {
 
@@ -22,13 +22,24 @@ void i2c_init() {
   i2c_config.frequency = NRF_DRV_TWI_FREQ_100K;
   i2c_config.interrupt_priority = 0;
 
-  ret_code_t init_ret = nrf_twi_mngr_init(i2c, &i2c_config);
+  ret_code_t init_ret = nrf_twi_mngr_init(state_i2c, &i2c_config);
   if (init_ret != NRF_SUCCESS) {
     printf("some error in init twi\n");
   } else {
     printf("successful twi init\n");
   }
 
+}
+
+void i2c_write_reg(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t length) {
+    uint8_t combined_buffer[length];
+    combined_buffer[0] = reg_addr;
+
+    for (int i = 0; i < length; i++) {
+        combined_buffer[i + 1] = buffer[i];
+    }
+
+    i2c_write_packet(i2c_addr, combined_buffer, length + 1, 0);
 }
 
 void i2c_read_reg(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t length) {
@@ -51,9 +62,9 @@ void i2c_manage_packet(uint8_t i2c_addr,
     ret_code_t result;
 
     if (rx) {
-        result = nrf_twi_mngr_perform(i2c, NULL, &read_transfer, 1, NULL);
+        result = nrf_twi_mngr_perform(state_i2c, NULL, &read_transfer, 1, NULL);
     } else {
-        result = nrf_twi_mngr_perform(i2c, NULL, &write_transfer, 1, NULL);
+        result = nrf_twi_mngr_perform(state_i2c, NULL, &write_transfer, 1, NULL);
     }
 
     if (result != NRF_SUCCESS) {

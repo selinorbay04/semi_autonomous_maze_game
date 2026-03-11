@@ -1,8 +1,7 @@
+#ifndef GRIDEYE_H
+#define GRIDEYE_H
 
-#include "nrf.h"
 #include <stdint.h>
-
-#include "i2c_utils.h"
 
 #define GRIDEYE_ADDR 0x69
 #define TEMP_REG_START 0x80
@@ -18,5 +17,7 @@ void read_grid(float* grid_buffer);
 void print_grid();
 
 // Debugging tool which prints which grid indices are
-// considered "line" with a given threshold
+// considered "line" with a given threshold above the average
 void print_grid_threshold(float threshold);
+
+#endif

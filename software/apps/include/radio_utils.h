@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef RADIO_UTILS_H
+#define RADIO_UTILS_H
+
 #include "nrf.h"
 #include "nrf_error.h"
 #include "nrf_802154.h"
@@ -11,6 +14,7 @@
 
 #define TURN_LEFT  0xFF
 #define TURN_RIGHT 0x00
+#define AT_JUNCTION 0x30
 
 #define PSDU_MAX_SIZE (127)
 #define FCS_LENGTH    (2)
@@ -41,3 +45,5 @@ void     send_radio_command(uint8_t command_byte);
 // RX helpers
 void    recieve_(void);
 uint8_t recieve_pkt_raw(uint8_t* pkt); 
+
+#endif

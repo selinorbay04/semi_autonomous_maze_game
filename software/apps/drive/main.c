@@ -10,26 +10,26 @@
 
 // Helper libraries
 #include "i2c_utils.h"
-#include "state.h"
 #include "car_utils.h"
-
-// Pin configurations
-#include "microbit_v2.h"
+#include "apds-9960.h"
+#include "pca9548a.h"
+#include "hc-sr04.h"
+// #include "radio_utils.h"
 
 int main(void) {
 
   i2c_init();
-
   motor_init();
-  //drive(15);
-  drive_left(-55);
-  drive_right(55);
+  mux_init_sensors();
+  hc_sr_init();
+  // nrf_802154_configure(true);
 
-  // Enter main loop.
+  //auto_drive(40, 40, 10);
+
   while (1) {
-    nrf_delay_ms(50);
-
-    // nrf_twi_mngr_perform(&twi_mngr, &i2c_config, transfer_array, 3, NULL);
+    float dist = find_distance();
+    printf("Cur dist in in: %f\n\n", dist);
+    nrf_delay_ms(250);
   }
 }
 
