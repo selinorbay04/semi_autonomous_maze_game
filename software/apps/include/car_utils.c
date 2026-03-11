@@ -1,5 +1,6 @@
 
 #include "nrf.h"
+#include "nrf_delay.h"
 #include "nrf_twi_mngr.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -88,10 +89,12 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
                 case STATE_LEFT_TRIGGERED:
                     turn(MOTOR_LEFT, turn_speed);
                     state_line_changed = false;
+                    push_decision(DECISION_LEFT);
                     break;
                 case STATE_RIGHT_TRIGGERED:
                     turn(MOTOR_RIGHT, turn_speed);
                     state_line_changed = false;
+                    push_decision(DECISION_RIGHT);
                     break;
                 case STATE_AT_JUNCTION:
                     // Send radio message and wait
@@ -99,11 +102,29 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
                     // uint8_t* pkt = load_pkt(AT_JUNCTION, 1);
                     // send_pkt(pkt);
                     // Some sort of sleep or blocking
+
+                    // Test code to see replay of stack
                     drive(0);
+                    nrf_delay_ms(9000);
+                    state_game_over = true;
                     break;
             }
         }
-
     }
+
+    // Test code to see replay of stack
+    junction_decision replay = pop_decision();
+    while (replay != DECISION_ERROR) {
+        if (replay == DECISION_LEFT) {
+            turn(MOTOR_RIGHT, turn_speed);
+        } else if (replay == DECISION_RIGHT) {
+            turn(MOTOR_LEFT, turn_speed);
+        }
+        nrf_delay_ms(500);
+        drive(-drive_speed);
+        nrf_delay_ms(500);
+        replay = pop_decision();
+    }
+    drive(0);
 }
 
