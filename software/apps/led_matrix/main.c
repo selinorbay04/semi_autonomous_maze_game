@@ -10,25 +10,24 @@
 
 #include "led_matrix.h"
 #include "microbit_v2.h"
-#include "snake_game.h"
 
 int main(void) {
   printf("Board started!\n");
   
   // initialize LED matrix driver
   led_matrix_init();
-  snake_game_init();
-
 
   // call other functions here
   // char input[] = "Hi CE346!";
   // char input2[] = "It works!";
   // set_string(input);
   // loop forever
+  
+  bool frame[5][5] = RIGHT_ARROW;
+
   while (1) {
     nrf_delay_ms(500);
-    snake_game_advance_state();
-    // set_string(input2);
+    led_matrix_set_frame(frame);
   }
 }
 

@@ -90,6 +90,7 @@ int main(void) {
     // }
 
     i2c_init();
+    motor_init();
 
     // Configure radio as receiver and listen 
     nrf_802154_configure(false);

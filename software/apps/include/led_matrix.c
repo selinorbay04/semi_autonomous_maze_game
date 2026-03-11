@@ -8,7 +8,6 @@
 #include "app_timer.h"
 
 #include "led_matrix.h"
-#include "font.h"
 #include "microbit_v2.h"
 
 APP_TIMER_DEF(led_timer);
@@ -25,23 +24,15 @@ int curr_char = 0;
 bool led_states[5][5] = {false}; 
 uint16_t curr_row = 0;
 
-void read_char(char c) {
-  // read character from font and update led_states
-  for (int row = 0; row < 5; row++) {
-    for (int col = 0; col < 5; col++) {
-      led_states[row][col] = (font[c][row] >> col) & 1;
+void led_matrix_set_frame(bool frame[5][5]) {
+  if (frame == NULL) return;
+  for (int r = 0; r < 5; r++) {
+    for (int c = 0; c < 5; c++) {
+      led_states[r][c] = frame[r][c];
     }
   }
 }
 
-void set_string(char* str) {
-  // read each character in the string and update led_states
-  // for (int i = 0; str[i] != 0; i++) {
-  //   read_char(str[i]);
-  // }
-  message = str;
-  curr_char = 0;
-}
 
 static void led_timer_handler(void* _unused) {
   // toggle LEDs here

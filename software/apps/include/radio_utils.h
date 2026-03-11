@@ -36,6 +36,7 @@ void nrf_802154_tx_started(const uint8_t* p_frame);
 // TX helpers
 uint8_t* load_pkt(uint8_t payload, uint8_t size);
 void     send_pkt(uint8_t* pkt);
+void     send_radio_command(uint8_t command_byte);
 
 // RX helpers
 void    recieve_(void);

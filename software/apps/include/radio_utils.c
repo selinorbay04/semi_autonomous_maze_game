@@ -79,6 +79,11 @@ void send_pkt(uint8_t* pkt) {
     }
 }
 
+void send_radio_command(uint8_t command_byte) {
+    uint8_t* pkt = load_pkt(command_byte, 1);
+    send_pkt(pkt);
+}
+
 // callbacks required by the driver
 
 void nrf_802154_transmitted_raw(const uint8_t* p_frame, uint8_t* p_ack, int8_t power, uint8_t lqi) {
