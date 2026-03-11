@@ -13,6 +13,7 @@
 #include "car_utils.h"
 #include "apds-9960.h"
 #include "pca9548a.h"
+#include "hc-sr04.h"
 // #include "radio_utils.h"
 
 int main(void) {
@@ -22,10 +23,12 @@ int main(void) {
   mux_init_sensors();
   // nrf_802154_configure(true);
 
-  auto_drive(40, 40, 10);
+  //auto_drive(40, 40, 10);
 
-  // while (1) {
-  //   nrf_delay_ms(250);
-  // }
+  while (1) {
+    float dist = find_distance();
+    printf("Cur dist in in: %f\n\n", dist);
+    nrf_delay_ms(250);
+  }
 }
 

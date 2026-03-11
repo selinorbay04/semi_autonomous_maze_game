@@ -79,6 +79,11 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
     while (!state_game_over) {
 
         mux_update_line_state(threshold);
+        // Check distance to barrier,
+        // if close enough we should set state_backtracking
+        // and invert drive_speed and turn_speed until we
+        // hit a junction. Then invert them again and pop_decision
+        // and push the opposite decision
 
         if (state_line_changed) {
             switch (state_line_trigger) {

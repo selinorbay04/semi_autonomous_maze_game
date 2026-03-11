@@ -8,6 +8,8 @@
 extern const nrf_twi_mngr_t* state_i2c;
 
 extern bool state_game_over;
+extern bool state_backtracking;
+extern bool state_backtracking_changed;
 
 typedef enum {
     DECISION_LEFT,

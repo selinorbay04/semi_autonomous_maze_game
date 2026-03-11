@@ -12,6 +12,8 @@ NRF_TWI_MNGR_DEF(i2c_def, 1, 0);
 const nrf_twi_mngr_t* state_i2c = &i2c_def;
 
 bool state_game_over = false;
+bool state_backtracking = false;
+bool state_backtracking_changed = false;
 
 line_trigger state_line_trigger = STATE_NO_TRIGGERS;
 bool state_line_changed = false;
