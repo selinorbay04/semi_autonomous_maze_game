@@ -10,6 +10,21 @@ extern const nrf_twi_mngr_t* state_i2c;
 extern bool state_game_over;
 
 typedef enum {
+    LEFT,
+    RIGHT
+} junction_decision;
+
+typedef struct decision_node {
+    junction_decision decision;
+    struct decision_node* prev;
+} decision_node;
+
+extern decision_node* state_decision_stack;
+
+void push_decision(junction_decision decision);
+junction_decision pop_decision();
+
+typedef enum {
     STATE_AT_JUNCTION,
     STATE_LEFT_TRIGGERED,
     STATE_RIGHT_TRIGGERED,
