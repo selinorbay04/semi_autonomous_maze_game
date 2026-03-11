@@ -48,3 +48,12 @@ junction_decision pop_decision() {
     return  ret_val;
 }
 
+junction_decision peek_decision() {
+    if (state_decision_stack == NULL) {
+        printf("ERROR: attempting to peek at empty stack\n");
+        return NULL;
+    } else {
+        return state_decision_stack->decision;
+    }
+}
+
