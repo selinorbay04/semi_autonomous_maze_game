@@ -22,7 +22,7 @@ int main(void) {
   mux_init_sensors();
   // nrf_802154_configure(true);
 
-  auto_drive(28, 28, 10);
+  auto_drive(100, 100, 10);
 
   // Enter main loop.
   // while (1) {

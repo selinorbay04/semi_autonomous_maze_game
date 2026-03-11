@@ -99,6 +99,7 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
                     // uint8_t* pkt = load_pkt(AT_JUNCTION, 1);
                     // send_pkt(pkt);
                     // Some sort of sleep or blocking
+                    drive(0);
                     break;
             }
         }
