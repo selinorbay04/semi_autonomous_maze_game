@@ -31,7 +31,7 @@ typedef enum {
 #define AGAIN_MASK 3
 
 // Init/shutdown the device for color reads
-void apds_init();
+void apds_init(bool left);
 void apds_shutdown();
 
 // Read the clear/r/g/b color channel
@@ -48,7 +48,7 @@ bool detect_color(COLOR COI, int threshold);
 
 // Return if the sensor is over a line
 // Given a threshold to ignore small variations
-bool check_over_line(int threshold);
+bool check_over_line(int threshold, bool left);
 
 // Below this line probably not worth implementing
 // ------------------------------------------------

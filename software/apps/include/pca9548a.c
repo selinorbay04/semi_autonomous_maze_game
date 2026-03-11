@@ -22,17 +22,17 @@ void mux_activate_right() {
 
 void mux_init_sensors() {
   mux_activate_left();
-  apds_init();
+  apds_init(true);
   mux_activate_right();
-  apds_init();
+  apds_init(false);
 }
 
 void mux_update_line_state(int threshold) {
 
     mux_activate_left();
-    bool left_line_triggered = check_over_line(threshold);
+    bool left_line_triggered = check_over_line(threshold, true);
     mux_activate_right();
-    bool right_line_triggered = check_over_line(threshold);
+    bool right_line_triggered = check_over_line(threshold, false);
 
     // Check if you're hitting the line on
     // the left, the right, neither, or at a junction

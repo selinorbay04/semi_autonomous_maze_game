@@ -16,7 +16,8 @@ bool state_game_over = false;
 line_trigger state_line_trigger = STATE_NO_TRIGGERS;
 bool state_line_changed = false;
 
-uint16_t state_avg_white_reading = 0;
+uint16_t state_left_avg_white_reading = 0;
+uint16_t state_right_avg_white_reading = 0;
 
 decision_node* state_decision_stack = NULL;
 
@@ -37,7 +38,7 @@ junction_decision pop_decision() {
 
     if (state_decision_stack == NULL) {
         printf("ERROR: attempting to pop from empty stack\n");
-        return NULL;
+        return DECISION_ERROR;
     } else {
         ret_val = state_decision_stack->decision;
         decision_node* free_node = state_decision_stack;
@@ -45,13 +46,13 @@ junction_decision pop_decision() {
         free(free_node);
     }
 
-    return  ret_val;
+    return ret_val;
 }
 
 junction_decision peek_decision() {
     if (state_decision_stack == NULL) {
         printf("ERROR: attempting to peek at empty stack\n");
-        return NULL;
+        return DECISION_ERROR;
     } else {
         return state_decision_stack->decision;
     }

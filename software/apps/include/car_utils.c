@@ -60,11 +60,11 @@ void drive_left(int speed) {
 
 void turn(CAR_DIRECTION direction, int speed) {
     switch (direction) {
-        case LEFT:
+        case MOTOR_LEFT:
             drive_left(-speed);
             drive_right(speed);
             break;
-        case RIGHT:
+        case MOTOR_RIGHT:
             drive_left(speed);
             drive_right(-speed);
             break;
@@ -86,11 +86,11 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
                     state_line_changed = false;
                     break;
                 case STATE_LEFT_TRIGGERED:
-                    turn(LEFT, turn_speed);
+                    turn(MOTOR_LEFT, turn_speed);
                     state_line_changed = false;
                     break;
                 case STATE_RIGHT_TRIGGERED:
-                    turn(RIGHT, turn_speed);
+                    turn(MOTOR_RIGHT, turn_speed);
                     state_line_changed = false;
                     break;
                 case STATE_AT_JUNCTION:

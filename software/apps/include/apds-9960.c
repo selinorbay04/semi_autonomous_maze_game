@@ -16,7 +16,7 @@ static uint8_t APDS_WTIME_BYTE = 0x00;
 static uint8_t APDS_CONFIG1_BYTE = 0b01100010;
 static uint8_t APDS_CONTROL_BYTE = 0b11000010;
 
-void apds_init() {
+void apds_init(bool left) {
     // Initialize the als engine
     i2c_write_reg(0x39, APDS_ATIME_ADDR, &APDS_ATIME_BYTE, 1);
     i2c_write_reg(0x39, APDS_WTIME_ADDR, &APDS_WTIME_BYTE, 1);
@@ -35,8 +35,12 @@ void apds_init() {
     }
 
     avg_read /= num_reads;
-    state_avg_white_reading = avg_read;
-    printf("average read is: %i\n", state_avg_white_reading);
+    if (left) {
+        state_left_avg_white_reading = avg_read;
+    } else {
+        state_right_avg_white_reading = avg_read;
+    }
+    printf("average read is: %i\n", avg_read);
 }
 
 void apds_shutdown() {
@@ -52,10 +56,14 @@ bool check_avalid() {
     return !(status & AVALID_MASK);
 }
 
-bool check_over_line(int threshold) {
+bool check_over_line(int threshold, bool left) {
     uint16_t cur_read = read_clear();
 
-    return cur_read + threshold < state_avg_white_reading;
+    if (left) {
+        return cur_read + threshold < state_left_avg_white_reading;
+    } else {
+        return cur_read + threshold < state_right_avg_white_reading;
+    }
 }
 
 uint16_t read_color(uint8_t l_reg, uint8_t h_reg) {

@@ -10,8 +10,9 @@ extern const nrf_twi_mngr_t* state_i2c;
 extern bool state_game_over;
 
 typedef enum {
-    LEFT,
-    RIGHT
+    DECISION_LEFT,
+    DECISION_RIGHT,
+    DECISION_ERROR,
 } junction_decision;
 
 typedef struct decision_node {
@@ -25,7 +26,7 @@ extern decision_node* state_decision_stack;
 // decision that was made, pop returns the
 // last decision on the top of the stack and frees it
 // peek returns the last decision but does not free it
-// Pop and push return NULL upon failure (empty stack)
+// Pop and push return DECISION_ERROR upon failure (empty stack)
 void push_decision(junction_decision decision);
 junction_decision pop_decision();
 junction_decision peek_decision();
@@ -40,6 +41,7 @@ typedef enum {
 extern line_trigger state_line_trigger;
 extern bool state_line_changed;
 
-extern uint16_t state_avg_white_reading;
+extern uint16_t state_left_avg_white_reading;
+extern uint16_t state_right_avg_white_reading;
 
 #endif

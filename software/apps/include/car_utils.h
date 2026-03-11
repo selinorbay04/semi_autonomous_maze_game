@@ -4,8 +4,8 @@
 #define MOTOR_ADDR 0x59
 
 typedef enum {
-    LEFT,
-    RIGHT,
+    MOTOR_LEFT,
+    MOTOR_RIGHT,
 } CAR_DIRECTION;
 
 // Enable motor on startup
