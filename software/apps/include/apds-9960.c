@@ -78,18 +78,3 @@ uint16_t read_color() {
     //return cdata_scaled;
 }
 
-void update_line_state(int threshold) {
-    // TODO: Might need to go in the mux helper actually
-    // For now I'm just putting kinda working stuff
-    // to test the autodrive function
-    if (check_over_line(threshold) && state_line_trigger != STATE_LEFT_TRIGGERED) {
-        printf("Line state says should start turn\n");
-        state_line_trigger = STATE_LEFT_TRIGGERED;
-        state_line_changed = true;
-    } else if (!check_over_line(threshold) && state_line_trigger != STATE_NO_TRIGGERS) {
-        printf("Line state says should start drive\n");
-        state_line_trigger = STATE_NO_TRIGGERS;
-        state_line_changed = true;
-    }
-}
-

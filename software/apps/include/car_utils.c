@@ -6,9 +6,8 @@
 
 #include "car_utils.h"
 #include "i2c_utils.h"
-#include "apds-9960.h"
+#include "pca9548a.h"
 #include "state.h"
-#include "radio_utils.h"
 
 // Packages to send with motor commands
 uint8_t en_data[2] = {0x70, 1};
@@ -78,7 +77,7 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
 
     while (!state_game_over) {
 
-        update_line_state(threshold);
+        mux_update_line_state(threshold);
 
         if (state_line_changed) {
             switch (state_line_trigger) {

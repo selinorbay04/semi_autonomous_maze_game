@@ -10,23 +10,19 @@
 
 // Helper libraries
 #include "i2c_utils.h"
-#include "state.h"
 #include "car_utils.h"
-#include "grideye.h"
 #include "apds-9960.h"
+#include "pca9548a.h"
 // #include "radio_utils.h"
-
-// Pin configurations
-#include "microbit_v2.h"
 
 int main(void) {
 
   i2c_init();
   motor_init();
-  apds_init();
+  mux_init_sensors();
   // nrf_802154_configure(true);
 
-  auto_drive(28, 28, 50);
+  auto_drive(28, 28, 10);
 
   // Enter main loop.
   // while (1) {

@@ -29,11 +29,6 @@ uint16_t read_color();
 // Given a threshold to ignore small variations
 bool check_over_line(int threshold);
 
-// Update the state flags about being over the line
-// Given a threshold to ignore small variations
-// TODO: Might need to go in the mux helper actually
-void update_line_state(int threshold);
-
 // Below this line probably not worth implementing
 // ------------------------------------------------
 
