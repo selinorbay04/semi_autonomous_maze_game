@@ -8,7 +8,6 @@
 #include "app_timer.h"
 
 #include "led_matrix.h"
-#include "font.h"
 #include "microbit_v2.h"
 
 APP_TIMER_DEF(led_timer);
@@ -19,29 +18,21 @@ APP_TIMER_DEF(string_timer);
 uint32_t row_pins[] = {LED_ROW1, LED_ROW2, LED_ROW3, LED_ROW4, LED_ROW5};
 uint32_t col_pins[] = {LED_COL1, LED_COL2, LED_COL3, LED_COL4, LED_COL5};
 
-char* message = "";
-int curr_char = 0;
-
-bool led_states[5][5] = {false}; 
+bool led_states[5][5] = {false};
 uint16_t curr_row = 0;
 
-void read_char(char c) {
-  // read character from font and update led_states
-  for (int row = 0; row < 5; row++) {
-    for (int col = 0; col < 5; col++) {
-      led_states[row][col] = (font[c][row] >> col) & 1;
+static bool blink_frame[5][5];
+static bool blink_visible = false;
+
+void led_matrix_set_frame(bool frame[5][5]) {
+  if (frame == NULL) return;
+  for (int r = 0; r < 5; r++) {
+    for (int c = 0; c < 5; c++) {
+      led_states[r][c] = frame[r][c];
     }
   }
 }
 
-void set_string(char* str) {
-  // read each character in the string and update led_states
-  // for (int i = 0; str[i] != 0; i++) {
-  //   read_char(str[i]);
-  // }
-  message = str;
-  curr_char = 0;
-}
 
 static void led_timer_handler(void* _unused) {
   // toggle LEDs here
@@ -61,14 +52,29 @@ static void led_timer_handler(void* _unused) {
   }
 }
 
-static void increment_string_timer(void* unused){
-  // increment string timer here
-  
-  if (message[curr_char] == 0) {
-    curr_char = 0;
+static void blink_timer_handler(void* _unused) {
+  blink_visible = !blink_visible;
+  if (blink_visible) {
+    led_matrix_set_frame(blink_frame);
+  } else {
+    bool empty[5][5] = {false};
+    led_matrix_set_frame(empty);
   }
-  read_char(message[curr_char]);
-  curr_char += 1;
+}
+
+void led_matrix_blink_start(bool frame[5][5]) {
+  app_timer_stop(string_timer);
+  for (int r = 0; r < 5; r++)
+    for (int c = 0; c < 5; c++)
+      blink_frame[r][c] = frame[r][c];
+  blink_visible = false;
+  app_timer_start(string_timer, APP_TIMER_TICKS(500), NULL);
+}
+
+void led_matrix_blink_stop(void) {
+  app_timer_stop(string_timer);
+  bool empty[5][5] = {false};
+  led_matrix_set_frame(empty);
 }
 
 void set_state(bool states[5][5]) {
@@ -103,8 +109,7 @@ void led_matrix_init(void) {
   // initialize timer(s) (Step 2 and onwards)
   app_timer_init();
   
-  // app_timer_create(&string_timer, APP_TIMER_MODE_REPEATED, increment_string_timer);
-  // app_timer_start(string_timer, 32768, NULL);
+  app_timer_create(&string_timer, APP_TIMER_MODE_REPEATED, blink_timer_handler);
 
   app_timer_create(&led_timer, APP_TIMER_MODE_REPEATED, led_timer_handler);
   app_timer_start(led_timer, 100, NULL);

@@ -10,8 +10,11 @@ void nrf_802154_configure(bool sender) {
         nrf_802154_init();
         printf("Done with init for sender\n");
         nrf_802154_channel_set(11);
+        nrf_802154_promiscuous_set(true); // accept status packets from robot
         uint8_t src_pan_id[] = {0xcd, 0xab};
         nrf_802154_pan_id_set(src_pan_id);
+        uint8_t ctrl_addr[] = {0xdc, 0xa9, 0x35, 0x7b, 0x73, 0x36, 0xce, 0xf4};
+        nrf_802154_extended_address_set(ctrl_addr);
         printf("Radio configured!\n");
     } else {
         printf("About to init for receiver\n");
@@ -79,10 +82,47 @@ void send_pkt(uint8_t* pkt) {
     }
 }
 
-// callbacks required by the driver
+//use this to send info 
+void send_radio_command(uint8_t command_byte) {
+    uint8_t* pkt = load_pkt(command_byte, 1);
+    send_pkt(pkt);
+}
 
+
+//use this for alerting the user with robot state
+// Sends a status byte from robot to controller 
+//adresses obtained and flipped (src, dst) from load_pkt 
+
+void send_radio_status(uint8_t status) {
+    static uint8_t pkt[PSDU_MAX_SIZE];
+    uint8_t pan_id[]     = {0xcd, 0xab};
+    uint8_t robot_addr[] = {0x50, 0xbe, 0xca, 0xc3, 0x3c, 0x36, 0xce, 0xf4};
+    uint8_t ctrl_addr[]  = {0xdc, 0xa9, 0x35, 0x7b, 0x73, 0x36, 0xce, 0xf4};
+
+    nrf_802154_extended_address_set(robot_addr);
+
+    pkt[0] = 26 + FCS_LENGTH;
+    pkt[1] = 0x01;
+    pkt[2] = 0xcc;
+    pkt[3] = 0x00;
+    pkt[4] = 0xff;
+    pkt[5] = 0xff;
+    memcpy(&pkt[6],  ctrl_addr,  8);
+    memcpy(&pkt[14], pan_id,     2);
+    memcpy(&pkt[16], robot_addr, 8);
+    pkt[24] = status;
+
+    if (nrf_802154_transmit_raw(pkt, true)) {
+        printf("Status sent: 0x%02X\n", status);
+    } else {
+        printf("Failed to send status\n");
+    }
+}
+
+// callbacks required by the driver
 void nrf_802154_transmitted_raw(const uint8_t* p_frame, uint8_t* p_ack, int8_t power, uint8_t lqi) {
     printf("TX success\n");
+    recieve_(); 
 }
 
 void nrf_802154_transmit_failed(const uint8_t* p_frame, nrf_802154_tx_error_t error) {
