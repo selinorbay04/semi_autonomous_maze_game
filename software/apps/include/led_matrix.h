@@ -44,11 +44,14 @@
 
 void led_matrix_init(void);
 
-
 void set_state(bool states[5][5]);
 void led_matrix_set_frame(bool frame[5][5]);
 
-// You may need to add more functions here
+// Start blinking the given frame 
+void led_matrix_blink_start(bool frame[5][5]);
+
+// Stop blinking and clear the display
+void led_matrix_blink_stop(void);
 
 
 
