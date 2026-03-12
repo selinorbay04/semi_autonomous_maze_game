@@ -1,4 +1,5 @@
 
+#include "hc-sr04.h"
 #include "nrf.h"
 #include "nrf_delay.h"
 #include "nrf_twi_mngr.h"
@@ -40,6 +41,7 @@ static void set_speed(uint8_t* motor, int speed){
 
 void motor_init() {
     i2c_write_packet(MOTOR_ADDR, en_data, 2, 0);
+    drive(0);
 }
 
 void drive(int speed) {
@@ -84,8 +86,14 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
         // and invert drive_speed and turn_speed until we
         // hit a junction. Then invert them again and pop_decision
         // and push the opposite decision
+        if (check_hit_wall() && !state_backtracking_changed) {
+            printf("HIT WALL: BACKTRACK\n");
+            state_backtracking = true;
+            state_backtracking_changed = true;
+            drive_speed = -drive_speed;
+        }
 
-        if (state_line_changed) {
+        if (state_line_changed || state_backtracking_changed) {
             switch (state_line_trigger) {
                 case STATE_NO_TRIGGERS:
                     drive(drive_speed);
@@ -110,13 +118,17 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
 
                     // Test code to see replay of stack
                     drive(0);
-                    nrf_delay_ms(9000);
-                    state_game_over = true;
+                    push_decision(DECISION_RIGHT);
+                    take_right(turn_speed, threshold);
+                    nrf_delay_ms(4000);
+                    //state_game_over = true;
                     break;
             }
         }
     }
+}
 
+void replay_path(int drive_speed, int turn_speed, int threshold) {
     // Test code to see replay of stack
     junction_decision replay = pop_decision();
     while (replay != DECISION_ERROR) {
@@ -130,6 +142,41 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
         nrf_delay_ms(500);
         replay = pop_decision();
     }
+    drive(0);
+}
+
+// Turn until you're no longer at a junction, then stop
+// and return back to main drive loop
+void take_turn(int turn_speed, CAR_DIRECTION turn_direction, int threshold) {
+    printf("taking turn\n");
+
+    switch (turn_direction) {
+        case MOTOR_LEFT:
+            drive_right(turn_speed * TURN_BOOST);
+            drive_left(-10);
+            while (state_line_trigger != STATE_RIGHT_TRIGGERED) {
+                mux_update_line_state(threshold);
+            }
+            turn(MOTOR_RIGHT, turn_speed);
+            while (state_line_trigger == STATE_RIGHT_TRIGGERED) {
+                mux_update_line_state(threshold);
+            }
+            break;
+        case MOTOR_RIGHT:
+            //drive_left(turn_speed * TURN_BOOST);
+            //drive_right(-turn_speed);
+            turn(MOTOR_RIGHT, 60);
+            mux_update_line_state(threshold);
+            while (state_line_trigger == STATE_LEFT_TRIGGERED ||
+                state_line_trigger == STATE_AT_JUNCTION) {
+                mux_update_line_state(threshold);
+            }
+            drive(0);
+            nrf_delay_ms(100000);
+            break;
+    }
+
+    printf("done taking turn\n");
     drive(0);
 }
 

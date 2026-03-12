@@ -6,10 +6,11 @@
 #include <stdint.h>
 
 extern const nrf_twi_mngr_t* state_i2c;
+extern const nrf_twi_mngr_t* internal_i2c;
 
-extern bool state_game_over;
-extern bool state_backtracking;
-extern bool state_backtracking_changed;
+extern volatile bool state_game_over;
+extern volatile bool state_backtracking;
+extern volatile bool state_backtracking_changed;
 
 typedef enum {
     DECISION_LEFT,
@@ -40,8 +41,8 @@ typedef enum {
     STATE_NO_TRIGGERS,
 } line_trigger;
 
-extern line_trigger state_line_trigger;
-extern bool state_line_changed;
+extern volatile line_trigger state_line_trigger;
+extern volatile bool state_line_changed;
 
 extern uint16_t state_left_avg_white_reading;
 extern uint16_t state_right_avg_white_reading;

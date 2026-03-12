@@ -8,15 +8,17 @@
 #include "state.h"
 
 NRF_TWI_MNGR_DEF(i2c_def, 1, 0);
+NRF_TWI_MNGR_DEF(twi_mngr_instance, 1, 1);
 
 const nrf_twi_mngr_t* state_i2c = &i2c_def;
+const nrf_twi_mngr_t* internal_i2c = &twi_mngr_instance;
 
-bool state_game_over = false;
-bool state_backtracking = false;
-bool state_backtracking_changed = false;
+bool volatile state_game_over = false;
+bool volatile state_backtracking = false;
+bool volatile state_backtracking_changed = false;
 
-line_trigger state_line_trigger = STATE_NO_TRIGGERS;
-bool state_line_changed = false;
+line_trigger volatile state_line_trigger = STATE_NO_TRIGGERS;
+bool volatile state_line_changed = false;
 
 uint16_t state_left_avg_white_reading = 0;
 uint16_t state_right_avg_white_reading = 0;

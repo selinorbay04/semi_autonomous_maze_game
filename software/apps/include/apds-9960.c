@@ -60,9 +60,9 @@ bool check_over_line(int threshold, bool left) {
     uint16_t cur_read = read_clear();
 
     if (left) {
-        return cur_read + threshold < state_left_avg_white_reading;
+        return cur_read - threshold > state_left_avg_white_reading;
     } else {
-        return cur_read + threshold < state_right_avg_white_reading;
+        return cur_read - threshold > state_right_avg_white_reading;
     }
 }
 
@@ -86,6 +86,8 @@ bool detect_color(COLOR COI, int threshold) {
     uint16_t r = read_red();
     uint16_t g = read_green();
     uint16_t b = read_blue();
+
+    //printf("R: %i, G: %i, B: %i\n", r, g, b);
 
     switch (COI) {
         case RED:

@@ -96,5 +96,5 @@ float find_distance() {
 }
 
 bool check_hit_wall() {
-    return true;
+    return find_distance() < WALL_DISTANCE_THRESHOLD;
 }
