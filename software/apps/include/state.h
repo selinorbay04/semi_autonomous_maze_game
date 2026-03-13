@@ -15,6 +15,7 @@ extern volatile bool state_backtracking_changed;
 extern int state_drive_speed;
 extern int state_turn_speed;
 extern const int state_line_threshold;
+extern const int state_red_threshold;
 
 typedef enum {
     DECISION_LEFT,
@@ -25,6 +26,7 @@ typedef enum {
 typedef struct decision_node {
     junction_decision decision;
     struct decision_node* prev;
+    struct decision_node* next;
 } decision_node;
 
 extern decision_node* state_decision_stack;

@@ -1,6 +1,7 @@
 #ifndef PCA_H
 #define PCA_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #define PCA_ADDR 0x70
@@ -16,6 +17,8 @@ void mux_init_sensors();
 
 // Update the state flags about being over the line
 // Given a threshold to ignore small variations
-void mux_update_line_state(int threshold);
+void mux_update_line_state();
+
+bool mux_check_end();
 
 #endif

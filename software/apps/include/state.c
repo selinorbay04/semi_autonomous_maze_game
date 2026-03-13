@@ -20,6 +20,7 @@ bool volatile state_backtracking_changed = false;
 int state_drive_speed = 40;
 int state_turn_speed = 25;
 const int state_line_threshold = 50;
+const int state_red_threshold = 55;
 
 line_trigger volatile state_line_trigger = STATE_NO_TRIGGERS;
 bool volatile state_line_changed = false;
@@ -34,11 +35,16 @@ void push_decision(junction_decision decision) {
 
     if (new == NULL) {
         printf("ERROR: failed to allocate a new decision node\n");
-    } else {
-        new->decision = decision;
-        new->prev = state_decision_stack;
-        state_decision_stack = new;
+        return;
     }
+
+    if (state_decision_stack != NULL) {
+        state_decision_stack->next = new;
+    }
+
+    new->decision = decision;
+    new->prev = state_decision_stack;
+    state_decision_stack = new;
 }
 
 junction_decision pop_decision() {

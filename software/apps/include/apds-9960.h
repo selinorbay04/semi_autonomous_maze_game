@@ -48,7 +48,7 @@ bool detect_color(COLOR COI, int threshold);
 
 // Return if the sensor is over a line
 // Given a threshold to ignore small variations
-bool check_over_line(int threshold, bool left);
+bool check_over_line(bool left);
 
 // Below this line probably not worth implementing
 // ------------------------------------------------

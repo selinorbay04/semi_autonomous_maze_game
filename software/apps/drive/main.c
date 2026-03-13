@@ -29,9 +29,10 @@ int main(void) {
   auto_drive();
 
   while (1) {
-    get_heading();
+    //get_heading();
     // float dist = find_distance();
     // printf("Cur dist in in: %f\n\n", dist);
+    //printf("at end? %i\n", mux_check_end());
     nrf_delay_ms(250);
   }
 }

@@ -1,6 +1,8 @@
 #ifndef CAR_UTILS_H
 #define CAR_UTILS_H
 
+#include <stdint.h>
+
 #define MOTOR_ADDR 0x59
 
 // Multiplier on whichever motor
@@ -37,6 +39,8 @@ void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi);
 #define take_left() take_turn(MOTOR_LEFT)
 #define take_right() take_turn(MOTOR_RIGHT)
 void take_turn(CAR_DIRECTION turn_direction);
+
+void turn_around();
 
 // Functions to drive given motors with given speeds
 // Accepts values -127, 127 to go forwards or backwards

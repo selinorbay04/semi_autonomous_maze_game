@@ -56,13 +56,13 @@ bool check_avalid() {
     return !(status & AVALID_MASK);
 }
 
-bool check_over_line(int threshold, bool left) {
+bool check_over_line(bool left) {
     uint16_t cur_read = read_clear();
 
     if (left) {
-        return cur_read + threshold < state_left_avg_white_reading;
+        return cur_read < state_line_threshold;
     } else {
-        return cur_read + threshold < state_right_avg_white_reading;
+        return cur_read < state_line_threshold;
     }
 }
 

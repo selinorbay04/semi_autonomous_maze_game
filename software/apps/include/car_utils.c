@@ -99,7 +99,7 @@ void auto_drive() {
 
     while (!state_game_over) {
 
-        mux_update_line_state(state_line_threshold);
+        mux_update_line_state();
         // Check distance to barrier,
         // if close enough we should set state_backtracking
         // and invert drive_speed and turn_speed until we
@@ -107,10 +107,9 @@ void auto_drive() {
         // and push the opposite decision
         if (check_hit_wall() && !state_backtracking_changed) {
             printf("HIT WALL: BACKTRACK\n");
+            turn_around();
             state_backtracking = true;
             state_backtracking_changed = true;
-            state_drive_speed = -state_drive_speed;
-            //turn_speed = -turn_speed;
         }
 
         if (state_line_changed || state_backtracking_changed) {
@@ -133,37 +132,86 @@ void auto_drive() {
                     drive(0);
                     state_line_changed = false;
 
-                    send_radio_status(AT_JUNCTION);
+                    if (state_backtracking) {
+                        state_backtracking = false;
+                        state_backtracking_changed = false;
 
-                    if (pending_cmd == TURN_RIGHT)
-                        take_right();
-                    if (pending_cmd == TURN_LEFT)
-                        take_left();
-                    if (pending_cmd)
+                        junction_decision old_move = pop_decision();
+                        if (old_move == DECISION_LEFT) {
+                            take_left();
+                        } else {
+                            take_right();
+                        }
+                    } else {
+
+                        send_radio_status(AT_JUNCTION);
+
+                        while (pending_cmd == 0) {
+                            // spin waiting for command
+                        }
+
+                        if (pending_cmd == TURN_RIGHT)
+                            take_right();
+                        if (pending_cmd == TURN_LEFT)
+                            take_left();
+
                         pending_cmd = 0;
-                    // push_decision(DECISION_RIGHT);
-                    //take_right(turn_speed, threshold);
-                    // nrf_delay_ms(4000);
-                    //state_game_over = true;
+                    }
                     break;
             }
         }
+
+        state_game_over = mux_check_end();
     }
+
+    drive(0);
+    printf("Reached the end!\n");
+    turn_around();
 }
 
 void replay_path(int drive_speed, int turn_speed, int threshold) {
+
+    state_game_over = false;
+
+    decision_node backtrack_node;
+
+    while (backtrack_node = traverse_for_backtrack()) {
+        substitute_backtrack(backtrack_node, 1);
+    }
+
     // Test code to see replay of stack
     junction_decision replay = pop_decision();
-    while (replay != DECISION_ERROR) {
-        if (replay == DECISION_LEFT) {
-            turn_in_place(MOTOR_RIGHT);
-        } else if (replay == DECISION_RIGHT) {
-            turn_in_place(MOTOR_LEFT);
+    while (replay != DECISION_ERROR && !state_game_over) {
+
+        mux_update_line_state();
+
+        if (state_line_changed) {
+            switch (state_line_trigger) {
+                case STATE_NO_TRIGGERS:
+                    drive(state_drive_speed);
+                    state_line_changed = false;
+                    break;
+                case STATE_LEFT_TRIGGERED:
+                    turn_in_place(MOTOR_LEFT);
+                    state_line_changed = false;
+                    break;
+                case STATE_RIGHT_TRIGGERED:
+                    turn_in_place(MOTOR_RIGHT);
+                    state_line_changed = false;
+                    break;
+                case STATE_AT_JUNCTION:
+                    // Do the opposite of the pop
+                    if (replay == DECISION_LEFT) {
+                        take_right();
+                    } else {
+                        take_left();
+                    }
+                    replay = pop_decision();
+                    break;
+            }
         }
-        nrf_delay_ms(500);
-        drive(-drive_speed);
-        nrf_delay_ms(500);
-        replay = pop_decision();
+
+        state_game_over = mux_check_end();
     }
     drive(0);
 }
@@ -175,18 +223,39 @@ void take_turn(CAR_DIRECTION turn_direction) {
 
     switch (turn_direction) {
         case MOTOR_LEFT:
-            drive_right(state_turn_speed * TURN_BOOST);
-            drive_left(-10);
+            drive(state_drive_speed);
+            nrf_delay_ms(250);
+            state_turn_speed *= TURN_BOOST;
+            turn_in_place(MOTOR_LEFT);
+            state_turn_speed /= TURN_BOOST;
+            // Attempt to turn past the first black line
+            while (state_line_trigger == STATE_RIGHT_TRIGGERED ||
+                state_line_trigger == STATE_AT_JUNCTION) {
+                mux_update_line_state();
+
+                // If the left is also trig'd, reverse it
+                if (state_line_trigger == STATE_AT_JUNCTION) {
+                    drive_left(-state_turn_speed);
+                } else {
+                    drive_left(0);
+                }
+            }
+            // Continue to turn until the next black line
             while (state_line_trigger != STATE_RIGHT_TRIGGERED) {
-                mux_update_line_state(state_line_threshold);
+                mux_update_line_state();
+
+                // If the left is also trig'd, reverse it
+                if (state_line_trigger == STATE_LEFT_TRIGGERED) {
+                    drive_left(-state_turn_speed);
+                } else {
+                    drive_left(0);
+                }
             }
-            turn_in_place(MOTOR_RIGHT);
-            while (state_line_trigger == STATE_RIGHT_TRIGGERED) {
-                mux_update_line_state(state_line_threshold);
-            }
+            //drive(0);
+            //nrf_delay_ms(100000);
             break;
         case MOTOR_RIGHT:
-            drive(state_turn_speed);
+            drive(state_drive_speed);
             nrf_delay_ms(250);
             state_turn_speed *= TURN_BOOST;
             turn_in_place(MOTOR_RIGHT);
@@ -194,7 +263,7 @@ void take_turn(CAR_DIRECTION turn_direction) {
             // Attempt to turn past the first black line
             while (state_line_trigger == STATE_LEFT_TRIGGERED ||
                 state_line_trigger == STATE_AT_JUNCTION) {
-                mux_update_line_state(state_line_threshold);
+                mux_update_line_state();
 
                 // If the right is also trig'd, reverse it
                 if (state_line_trigger == STATE_AT_JUNCTION) {
@@ -205,7 +274,7 @@ void take_turn(CAR_DIRECTION turn_direction) {
             }
             // Continue to turn until the next black line
             while (state_line_trigger != STATE_LEFT_TRIGGERED) {
-                mux_update_line_state(state_line_threshold);
+                mux_update_line_state();
 
                 // If the right is also trig'd, reverse it
                 if (state_line_trigger == STATE_RIGHT_TRIGGERED) {
@@ -219,13 +288,24 @@ void take_turn(CAR_DIRECTION turn_direction) {
             break;
     }
 
-    if (state_backtracking) {
-        state_backtracking = false;
-        state_backtracking_changed = true;
-        state_drive_speed = -state_drive_speed;
+    switch (turn_direction) {
+        case MOTOR_RIGHT:
+            push_decision(DECISION_RIGHT);
+            break;
+        case MOTOR_LEFT:
+            push_decision(DECISION_LEFT);
+            break;
     }
 
     printf("done taking turn\n");
     drive(0);
 }
 
+
+void turn_around() {
+    state_turn_speed = 35;
+    turn_in_place(MOTOR_RIGHT);
+    state_turn_speed = 25;
+    nrf_delay_ms(2200);
+    drive(0);
+}

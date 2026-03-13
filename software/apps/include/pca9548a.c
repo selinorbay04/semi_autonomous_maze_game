@@ -27,12 +27,12 @@ void mux_init_sensors() {
   apds_init(false);
 }
 
-void mux_update_line_state(int threshold) {
+void mux_update_line_state() {
 
     mux_activate_left();
-    bool left_line_triggered = check_over_line(threshold, true);
+    bool left_line_triggered = check_over_line(true);
     mux_activate_right();
-    bool right_line_triggered = check_over_line(threshold, false);
+    bool right_line_triggered = check_over_line(false);
 
     // Check if you're hitting the line on
     // the left, the right, neither, or at a junction
@@ -81,5 +81,16 @@ void mux_update_line_state(int threshold) {
                 break;
         }
     }
+
+}
+
+bool mux_check_end() {
+
+    mux_activate_left();
+    bool left_line_end = detect_color(RED, state_red_threshold);
+    mux_activate_right();
+    bool right_line_end = detect_color(RED, state_red_threshold);
+
+    return left_line_end || right_line_end;
 
 }
