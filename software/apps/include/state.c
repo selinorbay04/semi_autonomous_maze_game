@@ -72,3 +72,24 @@ junction_decision peek_decision() {
     }
 }
 
+void print_decision_stack() {
+    decision_node* temp = state_decision_stack;
+    while (temp != NULL) {
+        switch (temp->decision) {
+            case DECISION_LEFT:
+                printf("L");
+                break;
+            case DECISION_RIGHT:
+                printf("R");
+                break;
+            case DECISION_ERROR:
+                printf("!!E!!");
+                break;
+        }
+        temp = temp->prev;
+    }
+    printf("\n");
+}
+
+
+

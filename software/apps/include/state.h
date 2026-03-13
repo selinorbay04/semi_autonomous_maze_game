@@ -40,6 +40,8 @@ void push_decision(junction_decision decision);
 junction_decision pop_decision();
 junction_decision peek_decision();
 
+void print_decision_stack();
+
 typedef enum {
     STATE_AT_JUNCTION,
     STATE_LEFT_TRIGGERED,

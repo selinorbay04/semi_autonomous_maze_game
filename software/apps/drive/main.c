@@ -15,6 +15,7 @@
 #include "pca9548a.h"
 #include "hc-sr04.h"
 #include "lsm303agr.h"
+#include "state.h"
 // #include "radio_utils.h"
 
 int main(void) {
@@ -26,7 +27,30 @@ int main(void) {
   lsm303agr_init();
   // nrf_802154_configure(true);
 
-  auto_drive();
+  //auto_drive();
+
+
+  // testing stack sub
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_LEFT);
+  push_decision(DECISION_RIGHT);
+  push_decision(DECISION_RIGHT);
+
+  print_decision_stack();
+
 
   while (1) {
     //get_heading();

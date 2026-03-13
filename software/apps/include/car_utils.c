@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "car_utils.h"
 #include "i2c_utils.h"
@@ -169,15 +170,66 @@ void auto_drive() {
     turn_around();
 }
 
+void substitute_backtrack(decision_node* backtrack_node, uint8_t depth) {
+    // testing
+    print_decision_stack();
+    decision_node* previous_node = backtrack_node;
+    decision_node* next_node = backtrack_node;
+
+    for (int i = 0; i < depth; i++) {
+        previous_node = previous_node->prev;
+        next_node = next_node->next;
+    }
+
+    // If you find equal decisions, do the sub
+    if (previous_node->decision == next_node->decision) {
+        decision_node* new_decision = (decision_node*)malloc(sizeof(decision_node));
+        if (new_decision == NULL) {
+            printf("ERROR: failed to malloc new decision during sub\n");
+            return;
+        }
+
+        if (previous_node->prev != NULL) {
+            previous_node->prev->next = new_decision;
+            new_decision->prev = previous_node->prev;
+        }
+
+        if (next_node->next != NULL) {
+            next_node->next->prev = new_decision;
+            new_decision->next = next_node->next;
+        } else {
+            // Top of stack needs to be reset
+            state_decision_stack = new_decision;
+        }
+
+        // Free the unused nodes just for fun :P
+        while (previous_node != backtrack_node) {
+            decision_node* temp = previous_node;
+            previous_node = previous_node->next;
+            free(temp);
+        }
+        while (next_node != backtrack_node) {
+            decision_node* temp = next_node;
+            next_node = next_node->prev;
+            free(temp);
+        }
+        // Free the backtrack node
+        free(next_node);
+    } else {
+        // Otherwise keep looking
+        substitute_backtrack(backtrack_node, depth++);
+    }
+}
+
 void replay_path(int drive_speed, int turn_speed, int threshold) {
 
     state_game_over = false;
 
-    decision_node backtrack_node;
+    decision_node* backtrack_node;
 
-    while (backtrack_node = traverse_for_backtrack()) {
-        substitute_backtrack(backtrack_node, 1);
-    }
+    // while (backtrack_node = traverse_for_backtrack()) {
+    //     substitute_backtrack(backtrack_node, 1);
+    // }
 
     // Test code to see replay of stack
     junction_decision replay = pop_decision();
