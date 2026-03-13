@@ -139,8 +139,8 @@ void auto_drive() {
                     
                     send_radio_status(AT_JUNCTION);
 
-                    if(pending_cmd = TURN_RIGHT) take_right(turn_speed, threshold); 
-                    if(pending_cmd = TURN_LEFT) take_left(turn_speed, threshold); 
+                    if(pending_cmd = TURN_RIGHT) take_right(); 
+                    if(pending_cmd = TURN_LEFT) take_left(); 
                     // push_decision(DECISION_RIGHT);
                     //take_right(turn_speed, threshold);
                     // nrf_delay_ms(4000);

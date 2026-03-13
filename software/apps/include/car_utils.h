@@ -29,6 +29,9 @@ void drive(int speed);
 // as well as a threshold for variations in line detection
 void auto_drive();
 
+
+void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi);
+
 // Called to make the turn following a decision
 // at a junction
 #define take_left() take_turn(MOTOR_LEFT)
