@@ -3,6 +3,7 @@
 #include "nrf.h"
 #include "nrf_delay.h"
 #include "nrf_twi_mngr.h"
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -32,9 +33,6 @@ void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi) {
 }
 
 
-nrf_802154_configure(False);
-recieve_();
-
 // const nrf_twi_mngr_transfer_t en_motor = NRF_TWI_MNGR_WRITE(MOTOR_ADDR, en_data, 2, 0);
 // const nrf_twi_mngr_transfer_t start_motor1 = NRF_TWI_MNGR_WRITE(MOTOR_ADDR, motor1, 2, 0);
 // const nrf_twi_mngr_transfer_t start_motor2 = NRF_TWI_MNGR_WRITE(MOTOR_ADDR, motor2, 2, 0);
@@ -61,6 +59,8 @@ static void set_speed(uint8_t* motor, int speed){
 void motor_init() {
     i2c_write_packet(MOTOR_ADDR, en_data, 2, 0);
     drive(0);
+    nrf_802154_configure(false);
+    recieve_();
 }
 
 void drive(int speed) {
@@ -130,19 +130,17 @@ void auto_drive() {
                 case STATE_AT_JUNCTION:
                     // Send radio message and wait
                     // for radio interrupt
-                    // uint8_t* pkt = load_pkt(AT_JUNCTION, 1);
-                    // send_pkt(pkt);
-                    // Some sort of sleep or blocking
-
-                    // Test code to see replay of stack
                     drive(0);
-                    
+                    state_line_changed = false;
+
                     send_radio_status(AT_JUNCTION);
 
-                    if(pending_cmd = TURN_RIGHT) take_right(); 
-
-                    
-                    if(pending_cmd = TURN_LEFT) take_left(); 
+                    if (pending_cmd == TURN_RIGHT)
+                        take_right();
+                    if (pending_cmd == TURN_LEFT)
+                        take_left();
+                    if (pending_cmd)
+                        pending_cmd = 0;
                     // push_decision(DECISION_RIGHT);
                     //take_right(turn_speed, threshold);
                     // nrf_delay_ms(4000);

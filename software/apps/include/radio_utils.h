@@ -6,14 +6,12 @@
 #include "nrf.h"
 #include "nrf_error.h"
 #include "nrf_802154.h"
+#include "microbit_v2.h"
 #include <stdbool.h>
 #include <stdint.h>
 
-#define BTN_A 14
-#define BTN_B 23
-
 #define TURN_LEFT   0xFF
-#define TURN_RIGHT  0x00
+#define TURN_RIGHT  0x05
 
 
 #define AT_JUNCTION 0x30
