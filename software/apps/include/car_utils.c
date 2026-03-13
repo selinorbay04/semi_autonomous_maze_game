@@ -74,6 +74,8 @@ void turn(CAR_DIRECTION direction, int speed) {
     }
 }
 
+void turn_with_junction()
+
 void auto_drive(int drive_speed, int turn_speed, int threshold) {
 
     drive(drive_speed);
