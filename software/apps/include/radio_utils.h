@@ -14,6 +14,8 @@
 
 #define TURN_LEFT   0xFF
 #define TURN_RIGHT  0x00
+
+
 #define AT_JUNCTION 0x30
 #define AT_WALL     0x31
 #define MAZE_END    0x32
