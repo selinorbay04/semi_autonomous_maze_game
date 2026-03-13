@@ -29,6 +29,10 @@ void mux_init_sensors() {
 
 void mux_update_line_state() {
 
+    // if (mux_check_end()) {
+    //     return;
+    // }
+
     mux_activate_left();
     bool left_line_triggered = check_over_line(true);
     mux_activate_right();
@@ -87,9 +91,9 @@ void mux_update_line_state() {
 bool mux_check_end() {
 
     mux_activate_left();
-    bool left_line_end = detect_color(RED, state_red_threshold);
+    bool left_line_end = detect_color(GREEN, state_red_threshold);
     mux_activate_right();
-    bool right_line_end = detect_color(RED, state_red_threshold);
+    bool right_line_end = detect_color(GREEN, state_red_threshold);
 
     return left_line_end || right_line_end;
 

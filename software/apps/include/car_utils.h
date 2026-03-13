@@ -10,7 +10,7 @@
 // to avoid jittering
 #define STABILIZE_BOOST 2
 // Multiplier to take turns completely
-#define TURN_BOOST 2
+#define TURN_BOOST 1.5
 
 typedef enum {
     MOTOR_LEFT,
@@ -30,6 +30,9 @@ void drive(int speed);
 // Takes input as to how fast to drive and how fast to turn
 // as well as a threshold for variations in line detection
 void auto_drive();
+
+// After done auto_driving, replay the computed optimal path
+void replay_path();
 
 
 void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi);

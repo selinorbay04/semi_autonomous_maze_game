@@ -106,14 +106,13 @@ void auto_drive() {
         // and invert drive_speed and turn_speed until we
         // hit a junction. Then invert them again and pop_decision
         // and push the opposite decision
-        if (check_hit_wall() && !state_backtracking_changed) {
+        if (check_hit_wall()) {
             printf("HIT WALL: BACKTRACK\n");
+            state_line_changed = true;
             turn_around();
-            state_backtracking = true;
-            state_backtracking_changed = true;
         }
 
-        if (state_line_changed || state_backtracking_changed) {
+        if (state_line_changed) {
             switch (state_line_trigger) {
                 case STATE_NO_TRIGGERS:
                     drive(state_drive_speed);
@@ -133,36 +132,23 @@ void auto_drive() {
                     drive(0);
                     state_line_changed = false;
 
-                    if (state_backtracking) {
-                        state_backtracking = false;
-                        state_backtracking_changed = false;
+                    send_radio_status(AT_JUNCTION);
 
-                        junction_decision old_move = pop_decision();
-                        if (old_move == DECISION_LEFT) {
-                            take_left();
-                        } else {
-                            take_right();
-                        }
-                    } else {
-
-                        send_radio_status(AT_JUNCTION);
-
-                        while (pending_cmd == 0) {
-                            // spin waiting for command
-                        }
-
-                        if (pending_cmd == TURN_RIGHT)
-                            take_right();
-                        if (pending_cmd == TURN_LEFT)
-                            take_left();
-
-                        pending_cmd = 0;
+                    while (pending_cmd == 0) {
+                        // spin waiting for command
                     }
+
+                    if (pending_cmd == TURN_RIGHT)
+                        take_right();
+                    if (pending_cmd == TURN_LEFT)
+                        take_left();
+
+                    pending_cmd = 0;
                     break;
             }
         }
 
-        state_game_over = mux_check_end();
+        //state_game_over = mux_check_end();
     }
 
     drive(0);
@@ -171,8 +157,6 @@ void auto_drive() {
 }
 
 void substitute_backtrack(decision_node* backtrack_node, uint8_t depth) {
-    // testing
-    print_decision_stack();
     decision_node* previous_node = backtrack_node;
     decision_node* next_node = backtrack_node;
 
@@ -189,9 +173,17 @@ void substitute_backtrack(decision_node* backtrack_node, uint8_t depth) {
             return;
         }
 
+        if (previous_node->decision == DECISION_LEFT) {
+            new_decision->decision = DECISION_RIGHT;
+        } else {
+            new_decision->decision = DECISION_LEFT;
+        }
+
         if (previous_node->prev != NULL) {
             previous_node->prev->next = new_decision;
             new_decision->prev = previous_node->prev;
+        } else {
+            new_decision->prev = NULL;
         }
 
         if (next_node->next != NULL) {
@@ -217,19 +209,37 @@ void substitute_backtrack(decision_node* backtrack_node, uint8_t depth) {
         free(next_node);
     } else {
         // Otherwise keep looking
-        substitute_backtrack(backtrack_node, depth++);
+        substitute_backtrack(backtrack_node, depth + 1);
     }
+    print_decision_stack();
 }
 
-void replay_path(int drive_speed, int turn_speed, int threshold) {
+decision_node* traverse_for_backtrack() {
+
+    decision_node* current = state_decision_stack;
+
+    while(current != NULL){
+
+        if(current->decision == DECISION_BACKTRACK){
+            printf("Backtracking node found\n");
+            break;
+        }
+
+        current = current->prev;
+    }
+
+    return current;
+}
+
+void replay_path() {
 
     state_game_over = false;
 
     decision_node* backtrack_node;
 
-    // while (backtrack_node = traverse_for_backtrack()) {
-    //     substitute_backtrack(backtrack_node, 1);
-    // }
+    while ((bool)(backtrack_node = traverse_for_backtrack())) {
+        substitute_backtrack(backtrack_node, 1);
+    }
 
     // Test code to see replay of stack
     junction_decision replay = pop_decision();
@@ -355,26 +365,11 @@ void take_turn(CAR_DIRECTION turn_direction) {
 
 
 void turn_around() {
+    push_decision(DECISION_BACKTRACK);
+    int temp = state_turn_speed;
     state_turn_speed = 35;
     turn_in_place(MOTOR_RIGHT);
-    state_turn_speed = 25;
-    nrf_delay_ms(2200);
+    state_turn_speed = temp;
+    nrf_delay_ms(1500);
     drive(0);
-}
-
-decision_node* traverse_for_backtrack(){
-    
-    decision_node* current = state_decision_stack;
-
-    while(current != NULL){
-        
-        if(current->backtrack != NULL){
-            printf("Backtracking node found");
-            break;
-        }
-
-        current = current->next;
-    }
-
-    return current;
 }

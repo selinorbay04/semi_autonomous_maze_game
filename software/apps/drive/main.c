@@ -11,11 +11,10 @@
 // Helper libraries
 #include "i2c_utils.h"
 #include "car_utils.h"
-#include "apds-9960.h"
 #include "pca9548a.h"
 #include "hc-sr04.h"
 #include "lsm303agr.h"
-#include "state.h"
+#include "apds-9960.h"
 // #include "radio_utils.h"
 
 int main(void) {
@@ -27,36 +26,16 @@ int main(void) {
   lsm303agr_init();
   // nrf_802154_configure(true);
 
-  //auto_drive();
-
-
-  // testing stack sub
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_LEFT);
-  push_decision(DECISION_RIGHT);
-  push_decision(DECISION_RIGHT);
-
-  print_decision_stack();
-
+  auto_drive();
+  nrf_delay_ms(500);
+  replay_path();
 
   while (1) {
     //get_heading();
     // float dist = find_distance();
     // printf("Cur dist in in: %f\n\n", dist);
     //printf("at end? %i\n", mux_check_end());
+    //detect_color(RED, 10);
     nrf_delay_ms(250);
   }
 }

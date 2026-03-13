@@ -19,8 +19,8 @@ bool volatile state_backtracking_changed = false;
 
 int state_drive_speed = 40;
 int state_turn_speed = 25;
-const int state_line_threshold = 50;
-const int state_red_threshold = 55;
+const int state_line_threshold = 100;
+const int state_red_threshold = 65;
 
 line_trigger volatile state_line_trigger = STATE_NO_TRIGGERS;
 bool volatile state_line_changed = false;
@@ -44,6 +44,7 @@ void push_decision(junction_decision decision) {
 
     new->decision = decision;
     new->prev = state_decision_stack;
+    new->next = NULL;
     state_decision_stack = new;
 }
 
@@ -81,6 +82,9 @@ void print_decision_stack() {
                 break;
             case DECISION_RIGHT:
                 printf("R");
+                break;
+            case DECISION_BACKTRACK:
+                printf("B");
                 break;
             case DECISION_ERROR:
                 printf("!!E!!");
