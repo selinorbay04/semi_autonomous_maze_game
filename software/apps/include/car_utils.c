@@ -61,7 +61,7 @@ void drive_left(int speed) {
     i2c_write_packet(MOTOR_ADDR, motor2, 2, 0);
 }
 
-void turn(CAR_DIRECTION direction, int speed) {
+void turn_in_place(CAR_DIRECTION direction, int speed) {
     switch (direction) {
         case MOTOR_LEFT:
             drive_left(-speed);
@@ -91,6 +91,7 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
             state_backtracking = true;
             state_backtracking_changed = true;
             drive_speed = -drive_speed;
+            turn_speed = -turn_speed;
         }
 
         if (state_line_changed || state_backtracking_changed) {
@@ -100,14 +101,12 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
                     state_line_changed = false;
                     break;
                 case STATE_LEFT_TRIGGERED:
-                    turn(MOTOR_LEFT, turn_speed);
+                    turn_in_place(MOTOR_LEFT, turn_speed);
                     state_line_changed = false;
-                    push_decision(DECISION_LEFT);
                     break;
                 case STATE_RIGHT_TRIGGERED:
-                    turn(MOTOR_RIGHT, turn_speed);
+                    turn_in_place(MOTOR_RIGHT, turn_speed);
                     state_line_changed = false;
-                    push_decision(DECISION_RIGHT);
                     break;
                 case STATE_AT_JUNCTION:
                     // Send radio message and wait
@@ -118,9 +117,9 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
 
                     // Test code to see replay of stack
                     drive(0);
-                    push_decision(DECISION_RIGHT);
+                    // push_decision(DECISION_RIGHT);
                     take_right(turn_speed, threshold);
-                    nrf_delay_ms(4000);
+                    // nrf_delay_ms(4000);
                     //state_game_over = true;
                     break;
             }
@@ -133,9 +132,9 @@ void replay_path(int drive_speed, int turn_speed, int threshold) {
     junction_decision replay = pop_decision();
     while (replay != DECISION_ERROR) {
         if (replay == DECISION_LEFT) {
-            turn(MOTOR_RIGHT, turn_speed);
+            turn_in_place(MOTOR_RIGHT, turn_speed);
         } else if (replay == DECISION_RIGHT) {
-            turn(MOTOR_LEFT, turn_speed);
+            turn_in_place(MOTOR_LEFT, turn_speed);
         }
         nrf_delay_ms(500);
         drive(-drive_speed);
@@ -157,19 +156,37 @@ void take_turn(int turn_speed, CAR_DIRECTION turn_direction, int threshold) {
             while (state_line_trigger != STATE_RIGHT_TRIGGERED) {
                 mux_update_line_state(threshold);
             }
-            turn(MOTOR_RIGHT, turn_speed);
+            turn_in_place(MOTOR_RIGHT, turn_speed);
             while (state_line_trigger == STATE_RIGHT_TRIGGERED) {
                 mux_update_line_state(threshold);
             }
             break;
         case MOTOR_RIGHT:
-            //drive_left(turn_speed * TURN_BOOST);
-            //drive_right(-turn_speed);
-            turn(MOTOR_RIGHT, 60);
-            mux_update_line_state(threshold);
+            drive(turn_speed);
+            nrf_delay_ms(250);
+            turn_in_place(MOTOR_RIGHT, turn_speed * TURN_BOOST);
+            // Attempt to turn past the first black line
             while (state_line_trigger == STATE_LEFT_TRIGGERED ||
                 state_line_trigger == STATE_AT_JUNCTION) {
                 mux_update_line_state(threshold);
+
+                // If the right is also trig'd, reverse it
+                if (state_line_trigger == STATE_AT_JUNCTION) {
+                    drive_right(-turn_speed);
+                } else {
+                    drive_right(0);
+                }
+            }
+            // Continue to turn until the next black line
+            while (state_line_trigger != STATE_LEFT_TRIGGERED) {
+                mux_update_line_state(threshold);
+
+                // If the right is also trig'd, reverse it
+                if (state_line_trigger == STATE_AT_JUNCTION) {
+                    drive_right(-turn_speed);
+                } else {
+                    drive_right(0);
+                }
             }
             drive(0);
             nrf_delay_ms(100000);

@@ -45,6 +45,7 @@ void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi) {
     pending_cmd   = recieve_pkt_raw(p_data); 
     cmd_pending   = true;
     resignal_receive = true;
+    printf("Recieved command: %x\n", pending_cmd);
 }
 
 
@@ -92,6 +93,7 @@ int main(void) {
 
     i2c_init();
     motor_init();
+    hc_sr_init();
 
     // Configure radio as receiver and listen 
     nrf_802154_configure(false);
@@ -102,6 +104,7 @@ int main(void) {
 
     while (true) {
         if (cmd_pending) {
+            printf("attempting to handle pending command\n");
             cmd_pending = false;
             drive_motors(pending_cmd);
         }

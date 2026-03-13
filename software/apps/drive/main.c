@@ -26,11 +26,12 @@ int main(void) {
   lsm303agr_init();
   // nrf_802154_configure(true);
 
-  //auto_drive(35, 30, 5);
+  auto_drive(40, 30, 50);
 
   while (1) {
     get_heading();
-    //printf("Cur dist in in: %f\n\n", dist);
+    // float dist = find_distance();
+    // printf("Cur dist in in: %f\n\n", dist);
     nrf_delay_ms(250);
   }
 }
