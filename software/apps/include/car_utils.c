@@ -173,7 +173,7 @@ void replay_path(int drive_speed, int turn_speed, int threshold) {
 
     state_game_over = false;
 
-    decision_node backtrack_node;
+    decision_node* backtrack_node;
 
     while (backtrack_node = traverse_for_backtrack()) {
         substitute_backtrack(backtrack_node, 1);
@@ -308,4 +308,21 @@ void turn_around() {
     state_turn_speed = 25;
     nrf_delay_ms(2200);
     drive(0);
+}
+
+decision_node* traverse_for_backtrack(){
+    
+    decision_node* current = state_decision_stack;
+
+    while(current != NULL){
+        
+        if(current->backtrack != NULL){
+            printf("Backtracking node found");
+            break;
+        }
+
+        current = current->next;
+    }
+
+    return current;
 }

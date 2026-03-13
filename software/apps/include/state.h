@@ -27,6 +27,7 @@ typedef struct decision_node {
     junction_decision decision;
     struct decision_node* prev;
     struct decision_node* next;
+    struct decision_node* backtrack; 
 } decision_node;
 
 extern decision_node* state_decision_stack;
