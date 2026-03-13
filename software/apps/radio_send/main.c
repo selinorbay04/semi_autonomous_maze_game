@@ -76,13 +76,13 @@ static void BTN_B_handler(void) {
 
 #else
 //show arrow + send radio command
-static void BTN_A_handler(void) {
+static void BTN_B_handler(void) {
     led_matrix_blink_stop();
     set_state(left_arrow);
     send_radio_command(TURN_LEFT);
 }
 
-static void BTN_B_handler(void) {
+static void BTN_A_handler(void) {
     led_matrix_blink_stop();
     set_state(right_arrow);
     send_radio_command(TURN_RIGHT);
