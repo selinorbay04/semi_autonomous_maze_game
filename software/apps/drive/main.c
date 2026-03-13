@@ -26,7 +26,7 @@ int main(void) {
   lsm303agr_init();
   // nrf_802154_configure(true);
 
-  auto_drive(40, 30, 50);
+  auto_drive();
 
   while (1) {
     get_heading();
