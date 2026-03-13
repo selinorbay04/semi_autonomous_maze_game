@@ -15,6 +15,7 @@
 #include "hc-sr04.h"
 #include "lsm303agr.h"
 #include "apds-9960.h"
+#include "state.h"
 // #include "radio_utils.h"
 
 int main(void) {
@@ -25,6 +26,10 @@ int main(void) {
   hc_sr_init();
   lsm303agr_init();
   // nrf_802154_configure(true);
+
+  //push_decision(DECISION_LEFT);
+  //push_decision(DECISION_BACKTRACK);
+  //push_decision(DECISION_LEFT);
 
   auto_drive();
   nrf_delay_ms(500);

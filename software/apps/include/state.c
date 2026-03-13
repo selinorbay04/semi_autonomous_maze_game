@@ -14,13 +14,14 @@ const nrf_twi_mngr_t* state_i2c = &i2c_def;
 const nrf_twi_mngr_t* internal_i2c = &twi_mngr_instance;
 
 bool volatile state_game_over = false;
+bool volatile state_replaying = false;
 bool volatile state_backtracking = false;
 bool volatile state_backtracking_changed = false;
 
 int state_drive_speed = 40;
 int state_turn_speed = 25;
-const int state_line_threshold = 100;
-const int state_red_threshold = 65;
+const float state_line_threshold = 0.75;
+const float state_red_threshold = 3.2;
 
 line_trigger volatile state_line_trigger = STATE_NO_TRIGGERS;
 bool volatile state_line_changed = false;

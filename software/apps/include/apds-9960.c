@@ -60,9 +60,9 @@ bool check_over_line(bool left) {
     uint16_t cur_read = read_clear();
 
     if (left) {
-        return cur_read < state_line_threshold;
+        return cur_read < state_left_avg_white_reading * state_line_threshold;
     } else {
-        return cur_read < state_line_threshold;
+        return cur_read < state_right_avg_white_reading * state_line_threshold;
     }
 }
 
@@ -82,20 +82,20 @@ uint16_t read_color(uint8_t l_reg, uint8_t h_reg) {
     return cdata;
 }
 
-bool detect_color(COLOR COI, int threshold) {
-    uint16_t r = read_red();
-    uint16_t g = read_green();
-    uint16_t b = read_blue();
+bool detect_color(COLOR COI, float threshold) {
+    float r = (float)read_red();
+    float g = (float)read_green();
+    float b = (float)read_blue();
 
     //printf("R: %i, G: %i, B: %i\n", r, g, b);
 
     switch (COI) {
         case RED:
-            return r > g + threshold && r > b + threshold;
+            return r > g * threshold && r > b * threshold;
         case GREEN:
-            return g > r + threshold && g > b + threshold;
+            return g > r * threshold && g > b * threshold;
         case BLUE:
-            return b > g + threshold && b > r + threshold;
+            return b > g * threshold && b > r * threshold;
     }
 
     return false;

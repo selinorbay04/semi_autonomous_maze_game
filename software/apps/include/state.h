@@ -9,13 +9,14 @@ extern const nrf_twi_mngr_t* state_i2c;
 extern const nrf_twi_mngr_t* internal_i2c;
 
 extern volatile bool state_game_over;
+extern volatile bool state_replaying;
 extern volatile bool state_backtracking;
 extern volatile bool state_backtracking_changed;
 
 extern int state_drive_speed;
 extern int state_turn_speed;
-extern const int state_line_threshold;
-extern const int state_red_threshold;
+extern const float state_line_threshold;
+extern const float state_red_threshold;
 
 typedef enum {
     DECISION_LEFT,
