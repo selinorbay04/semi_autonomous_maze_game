@@ -6,7 +6,7 @@
 // Multiplier on whichever motor
 // is attempting the turn, trying
 // to avoid jittering
-#define STABILIZE_BOOST 1.5
+#define STABILIZE_BOOST 2
 // Multiplier to take turns completely
 #define TURN_BOOST 2
 
@@ -41,10 +41,5 @@ void take_turn(int turn_speed, CAR_DIRECTION turn_direction, int threshold);
 // Accepts values -127, 127 to go forwards or backwards
 void drive_left(int speed);
 void drive_right(int speed);
-
-
-// Function to make a decision at a junction
-// Accepts a direction and a speed -127, 127
-void turn(CAR_DIRECTION direction, int speed);
 
 #endif
