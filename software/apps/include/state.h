@@ -12,6 +12,10 @@ extern volatile bool state_game_over;
 extern volatile bool state_backtracking;
 extern volatile bool state_backtracking_changed;
 
+extern int state_drive_speed;
+extern int state_turn_speed;
+extern const int state_line_threshold;
+
 typedef enum {
     DECISION_LEFT,
     DECISION_RIGHT,
