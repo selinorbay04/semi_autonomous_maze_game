@@ -10,11 +10,30 @@
 #include "i2c_utils.h"
 #include "pca9548a.h"
 #include "state.h"
+#include "radio_utils.h"
 
 // Packages to send with motor commands
 uint8_t en_data[2] = {0x70, 1};
 uint8_t motor1[2] = {0x20, 129};
 uint8_t motor2[2] = {0x21, 129};
+
+
+
+static volatile uint8_t pending_cmd   = 0;
+static volatile bool    cmd_pending   = false;
+static volatile bool    resignal_receive = false;
+
+
+void nrf_802154_received_raw(uint8_t* p_data, int8_t power, uint8_t lqi) {
+    pending_cmd   = recieve_pkt_raw(p_data); 
+    cmd_pending   = true;
+    resignal_receive = true;
+    printf("Recieved command: %x\n", pending_cmd);
+}
+
+
+nrf_802154_configure(False);
+recieve_();
 
 // const nrf_twi_mngr_transfer_t en_motor = NRF_TWI_MNGR_WRITE(MOTOR_ADDR, en_data, 2, 0);
 // const nrf_twi_mngr_transfer_t start_motor1 = NRF_TWI_MNGR_WRITE(MOTOR_ADDR, motor1, 2, 0);
@@ -74,8 +93,6 @@ void turn_in_place(CAR_DIRECTION direction, int speed) {
     }
 }
 
-void turn_with_junction()
-
 void auto_drive(int drive_speed, int turn_speed, int threshold) {
 
     drive(drive_speed);
@@ -119,8 +136,13 @@ void auto_drive(int drive_speed, int turn_speed, int threshold) {
 
                     // Test code to see replay of stack
                     drive(0);
+                    
+                    send_radio_status(AT_JUNCTION);
+
+                    if(pending_cmd = TURN_RIGHT) take_right(turn_speed, threshold); 
+                    if(pending_cmd = TURN_LEFT) take_left(turn_speed, threshold); 
                     // push_decision(DECISION_RIGHT);
-                    take_right(turn_speed, threshold);
+                    //take_right(turn_speed, threshold);
                     // nrf_delay_ms(4000);
                     //state_game_over = true;
                     break;

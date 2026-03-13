@@ -35,6 +35,8 @@ void auto_drive(int drive_speed, int turn_speed, int threshold);
     take_turn(turn_speed, MOTOR_LEFT, threshold)
 #define take_right(turn_speed, threshold) \
     take_turn(turn_speed, MOTOR_RIGHT, threshold)
+
+    
 void take_turn(int turn_speed, CAR_DIRECTION turn_direction, int threshold);
 
 // Functions to drive given motors with given speeds
