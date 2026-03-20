@@ -5,8 +5,10 @@
 
 #include "pca9548a.h"
 #include "apds-9960.h"
+#include "nrf_gpio.h"
 #include "state.h"
 #include "i2c_utils.h"
+#include "microbit_v2.h"
 
 void mux_set_active(uint8_t ctrl_byte) {
     i2c_write_byte(PCA_ADDR, &ctrl_byte, 0);
@@ -21,17 +23,19 @@ void mux_activate_right() {
 }
 
 void mux_init_sensors() {
-  mux_activate_left();
-  apds_init(true);
-  mux_activate_right();
-  apds_init(false);
+    mux_activate_left();
+    apds_init(true);
+    mux_activate_right();
+    apds_init(false);
 }
 
 void mux_update_line_state() {
 
-    // if (mux_check_end()) {
-    //     return;
-    // }
+    if (mux_check_end()) {
+        state_line_trigger = STATE_NO_TRIGGERS;
+        state_line_changed = true;
+        return;
+    }
 
     mux_activate_left();
     bool left_line_triggered = check_over_line(true);
@@ -91,9 +95,9 @@ void mux_update_line_state() {
 bool mux_check_end() {
 
     mux_activate_left();
-    bool left_line_end = detect_color(GREEN, state_red_threshold);
+    bool left_line_end = detect_color(RED, state_red_threshold);
     mux_activate_right();
-    bool right_line_end = detect_color(GREEN, state_red_threshold);
+    bool right_line_end = detect_color(RED, state_red_threshold);
 
     return left_line_end || right_line_end;
 

@@ -44,7 +44,7 @@ uint16_t read_color(uint8_t l_reg, uint8_t h_reg);
 // Takes in a color of interest (R/G/B) and a threshold
 // returns true if the color is greater than
 // all the others by more than the threshold
-bool detect_color(COLOR COI, int threshold);
+bool detect_color(COLOR COI, float threshold);
 
 // Return if the sensor is over a line
 // Given a threshold to ignore small variations
