@@ -108,11 +108,13 @@ void auto_drive() {
         // and push the opposite decision
         if (check_hit_wall()) {
             printf("HIT WALL: BACKTRACK\n");
+            push_decision(DECISION_BACKTRACK);
             state_line_changed = true;
             turn_around();
         }
 
         if (state_line_changed) {
+            print_decision_stack();
             switch (state_line_trigger) {
                 case STATE_NO_TRIGGERS:
                     drive(state_drive_speed);
@@ -148,7 +150,7 @@ void auto_drive() {
             }
         }
 
-        //state_game_over = mux_check_end();
+        state_game_over = mux_check_end();
     }
 
     drive(0);
@@ -157,10 +159,16 @@ void auto_drive() {
 }
 
 void substitute_backtrack(decision_node* backtrack_node, uint8_t depth) {
+    print_decision_stack();
     decision_node* previous_node = backtrack_node;
     decision_node* next_node = backtrack_node;
 
     for (int i = 0; i < depth; i++) {
+        if (previous_node->prev == NULL || next_node->next == NULL) {
+            printf("ERROR: attempting to sub with invalid stack\n");
+            state_decision_stack = NULL;
+            return;
+        }
         previous_node = previous_node->prev;
         next_node = next_node->next;
     }
@@ -231,9 +239,25 @@ decision_node* traverse_for_backtrack() {
     return current;
 }
 
+void invert_stack_decisions() {
+    decision_node* current = state_decision_stack;
+
+    while(current != NULL){
+
+        if(current->decision == DECISION_LEFT){
+            current->decision = DECISION_RIGHT;
+        } else {
+            current->decision = DECISION_LEFT;
+        }
+
+        current = current->prev;
+    }
+}
+
 void replay_path() {
 
     state_game_over = false;
+    state_replaying = true;
 
     decision_node* backtrack_node;
 
@@ -241,13 +265,20 @@ void replay_path() {
         substitute_backtrack(backtrack_node, 1);
     }
 
+    invert_stack_decisions();
+
+    // Print new stack
+    printf("NEW STACK AFTER SUB\n");
+    print_decision_stack();
+
     // Test code to see replay of stack
-    junction_decision replay = pop_decision();
+    junction_decision volatile replay = pop_decision();
     while (replay != DECISION_ERROR && !state_game_over) {
 
         mux_update_line_state();
 
         if (state_line_changed) {
+            printf("CURRENT PENDING DECISION: %i\n", replay);
             switch (state_line_trigger) {
                 case STATE_NO_TRIGGERS:
                     drive(state_drive_speed);
@@ -262,8 +293,8 @@ void replay_path() {
                     state_line_changed = false;
                     break;
                 case STATE_AT_JUNCTION:
-                    // Do the opposite of the pop
-                    if (replay == DECISION_LEFT) {
+                    state_line_changed = false;
+                    if (replay == DECISION_RIGHT) {
                         take_right();
                     } else {
                         take_left();
@@ -350,13 +381,15 @@ void take_turn(CAR_DIRECTION turn_direction) {
             break;
     }
 
-    switch (turn_direction) {
-        case MOTOR_RIGHT:
-            push_decision(DECISION_RIGHT);
-            break;
-        case MOTOR_LEFT:
-            push_decision(DECISION_LEFT);
-            break;
+    if (!state_replaying) {
+        switch (turn_direction) {
+            case MOTOR_RIGHT:
+                push_decision(DECISION_RIGHT);
+                break;
+            case MOTOR_LEFT:
+                push_decision(DECISION_LEFT);
+                break;
+        }
     }
 
     printf("done taking turn\n");
@@ -365,11 +398,10 @@ void take_turn(CAR_DIRECTION turn_direction) {
 
 
 void turn_around() {
-    push_decision(DECISION_BACKTRACK);
     int temp = state_turn_speed;
     state_turn_speed = 35;
     turn_in_place(MOTOR_RIGHT);
     state_turn_speed = temp;
-    nrf_delay_ms(1500);
+    nrf_delay_ms(1700);
     drive(0);
 }
