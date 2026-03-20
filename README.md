@@ -1,62 +1,24 @@
-# Northwestern Micro:bit v2 Base
+# Semi-autonomous Maze Game
 
-Starter code for Northwestern course CE346 based on Micro:bit v2.
+This repo is based on starter code for Northwestern course CE346 based on Micro:bit v2.
 
 This repository has applications and board initialization that connects to the
 build system provided by [nrf52x-base](https://github.com/lab11/nrf52x-base).
 
+## Overview
 
-## Requirements
- 
- 1. Various tools
- 
-    * build-essential (make)
-    * git
-    * python3
-    * pyserial (`sudo apt install python3-serial` or `pipx install pyserial`)
+The purpose of this repo is to create a driving line following robot (powered by a Micro:bit) which can autonomously drive along a line until it reaches an intersection. Upon reaching an intersection it sends a request to a secondary Micro:bit, prompting a user to choose to go left or right. It waits in place until it receives a command.
 
- 2. ARM cross-compiler toolchain: [gcc-arm-none-eabi toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+After recieving a command, the robot takes the path it was given until it reaches another intersection, a dead-end, or the end of the maze (denoted with a red marker). If it reaches:
 
-    On Ubuntu:
+    1) Another Intersection: it repeats the steps described above.
+    2) A Dead-End: it turns around by itself and repeats the steps described above.
+    3) The End: it turns around and attempts to trace its way back to the start of the maze, optimizing the path the user initially took.
 
-        sudo apt install gcc-arm-none-eabi
+During the initial traversal of the maze, the robot keeps track of all decisions using a stack (left, right, and backtrack). When it finishes, it looks back over the stack and substitutes all incorrect paths (of any depth) with the proper turn that should have been taken. Then it makes its way back by popping from the stack and choosing the opposite decision until the stack is empty.
 
-    On MacOS:
+## Application Files
 
-        brew install gcc-arm-embedded
+The application files (directories in which to run `make flash`) are located in `./software/apps/drive/` and `./software/apps/radio_recv/`. Helper functions and drivers are location in `./software/apps/include/`.
 
- 3. JTAG programming tools: OpenOCD
-
-    On Ubuntu:
-
-        sudo apt install openocd
-
-    On MacOS:
-
-        brew install open-ocd
-
-
-## Installation
-
- * Clone the repository
- * Change directory into the repository
- * `git submodule update --init --recursive` (this will take a couple minutes to complete)
-
-
-## Building and loading applications
-
-To build an application, use `make` inside of the application's directory.
-
-`make flash` uploads the application to the board using JTAG.
-
-
-## Getting print data
-
-The Micro:bit v2 prints information through a serial port at 38400 baud. You
-can connect with any serial terminal, but miniterm comes with pyserial and
-works pretty well for this.
-
-```
-$ pyserial-miniterm /dev/ttyACM0 38400
-```
-
+The `drive` directory contains code for the robot, and `radio_recv` contains code for the controller. All other app directories should be ignored, they were just scratch work.
